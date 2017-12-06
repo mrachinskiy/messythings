@@ -13,7 +13,6 @@ class OBJECT_OT_MessyThings_Cleanup_Modifiers(Operator):
 		return context.mode == 'OBJECT'
 
 	def execute(self, context):
-		mod_del_types = {'CURVE', 'LATTICE', 'BOOLEAN'}
 		mod_del_count = 0
 
 		for ob in context.scene.objects:
@@ -21,7 +20,9 @@ class OBJECT_OT_MessyThings_Cleanup_Modifiers(Operator):
 
 			if ob.modifiers:
 				for mod in ob.modifiers:
-					if (mod.type in mod_del_types and not mod.object) or (mod.type == 'SHRINKWRAP' and not mod.target):
+					if ((mod.type in {'CURVE', 'LATTICE', 'BOOLEAN'} and not mod.object) or
+					   (mod.type == 'SHRINKWRAP' and not mod.target)):
+
 						ob.modifiers.remove(mod)
 						mod_del_count += 1
 
@@ -41,8 +42,6 @@ class OBJECT_OT_MessyThings_Cleanup_Objects(Operator):
 		return context.mode == 'OBJECT'
 
 	def execute(self, context):
-		ob_del_types = {'CURVE', 'LATTICE'}
-		mod_types = {'CURVE', 'LATTICE'}
 		obs_to_del = []
 		obs_in_use = set()
 		obs_del_count = 0
@@ -52,7 +51,7 @@ class OBJECT_OT_MessyThings_Cleanup_Objects(Operator):
 		for ob in context.scene.objects:
 			ob.hide = False
 
-			if ob.type in ob_del_types:
+			if ob.type in {'CURVE', 'LATTICE'}:
 				obs_to_del.append(ob)
 
 			# Empty mesh
@@ -62,7 +61,7 @@ class OBJECT_OT_MessyThings_Cleanup_Objects(Operator):
 			# Object dependencies
 			if ob.modifiers:
 				for mod in ob.modifiers:
-					if mod.type in mod_types and mod.object:
+					if mod.type in {'CURVE', 'LATTICE'} and mod.object:
 						obs_in_use.add(mod.object)
 
 			if ob.constraints:
