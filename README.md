@@ -1,5 +1,7 @@
 Messy Things – take care of badly organized projects, Blender add-on.
 
+**Warning:** this is in-house tool created for a specific task, and might not fit general use.
+
 
 How to install
 ==========================

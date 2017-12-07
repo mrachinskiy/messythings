@@ -32,7 +32,7 @@ class OBJECT_OT_MessyThings_Cleanup_Modifiers(Operator):
 
 
 class OBJECT_OT_MessyThings_Cleanup_Objects(Operator):
-	"""Remove empty Mesh, Lattice and Curve objects that are not in use by modifiers or constraints"""
+	"""Remove lattice, curve and empty mesh objects that are not in use by modifiers, constraints and curve Bevel Object and Taper Object properties"""
 	bl_label = 'Messy Things Cleanup Objects'
 	bl_idname = 'object.messythings_cleanup_objects'
 	bl_options = {'REGISTER', 'UNDO'}
@@ -49,6 +49,7 @@ class OBJECT_OT_MessyThings_Cleanup_Objects(Operator):
 		# Get objects
 
 		for ob in context.scene.objects:
+
 			ob.hide = False
 
 			if ob.type in {'CURVE', 'LATTICE'}:
@@ -69,12 +70,19 @@ class OBJECT_OT_MessyThings_Cleanup_Objects(Operator):
 					if con.type == 'FOLLOW_PATH' and con.target:
 						obs_in_use.add(con.target)
 
+			if ob.type == 'CURVE':
+				if ob.data.bevel_object:
+					obs_in_use.add(ob.data.bevel_object)
+				if ob.data.taper_object:
+					obs_in_use.add(ob.data.taper_object)
+
 		# Remove objects
 
-		for ob in obs_to_del:
-			if ob not in obs_in_use:
-				bpy.data.objects.remove(ob)
-				obs_del_count += 1
+		if obs_to_del:
+			for ob in obs_to_del:
+				if ob not in obs_in_use:
+					bpy.data.objects.remove(ob)
+					obs_del_count += 1
 
 		# Report
 
