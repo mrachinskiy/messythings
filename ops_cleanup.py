@@ -42,7 +42,7 @@ class OBJECT_OT_MessyThings_Cleanup_Objects(Operator):
 		return context.mode == 'OBJECT'
 
 	def execute(self, context):
-		obs_to_del = []
+		obs_to_del = set()
 		obs_in_use = set()
 		obs_del_count = 0
 
@@ -52,11 +52,11 @@ class OBJECT_OT_MessyThings_Cleanup_Objects(Operator):
 			ob.hide = False
 
 			if ob.type in {'CURVE', 'LATTICE'}:
-				obs_to_del.append(ob)
+				obs_to_del.add(ob)
 
 			# Empty mesh
 			if ob.type == 'MESH' and not ob.data.vertices:
-				obs_to_del.append(ob)
+				obs_to_del.add(ob)
 
 			# Object dependencies
 			if ob.modifiers:
