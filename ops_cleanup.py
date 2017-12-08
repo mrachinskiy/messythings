@@ -32,7 +32,7 @@ class OBJECT_OT_MessyThings_Cleanup_Modifiers(Operator):
 
 
 class OBJECT_OT_MessyThings_Cleanup_Objects(Operator):
-	"""Remove lattice, curve and empty mesh objects that are not in use by modifiers, constraints and curve Bevel Object and Taper Object properties"""
+	"""Remove lattice, curve and empty mesh objects that are not in use by modifiers, constraints and curve's Bevel Object and Taper Object properties"""
 	bl_label = 'Messy Things Cleanup Objects'
 	bl_idname = 'object.messythings_cleanup_objects'
 	bl_options = {'REGISTER', 'UNDO'}
@@ -44,7 +44,9 @@ class OBJECT_OT_MessyThings_Cleanup_Objects(Operator):
 	def execute(self, context):
 		obs_to_del = set()
 		obs_in_use = set()
-		obs_del_count = 0
+		curve_del_count = 0
+		lat_del_count = 0
+		mesh_del_count = 0
 
 		# Get objects
 
@@ -52,11 +54,7 @@ class OBJECT_OT_MessyThings_Cleanup_Objects(Operator):
 
 			ob.hide = False
 
-			if ob.type in {'CURVE', 'LATTICE'}:
-				obs_to_del.add(ob)
-
-			# Empty mesh
-			if ob.type == 'MESH' and not ob.data.vertices:
+			if (ob.type in {'CURVE', 'LATTICE'}) or (ob.type == 'MESH' and not ob.data.vertices):
 				obs_to_del.add(ob)
 
 			# Object dependencies
@@ -81,15 +79,22 @@ class OBJECT_OT_MessyThings_Cleanup_Objects(Operator):
 		if obs_to_del:
 			for ob in obs_to_del:
 				if ob not in obs_in_use:
+
+					if ob.type == 'CURVE':
+						curve_del_count += 1
+					elif ob.type == 'LATTICE':
+						lat_del_count += 1
+					elif ob.type == 'MESH':
+						mesh_del_count += 1
+
 					bpy.data.objects.remove(ob)
-					obs_del_count += 1
 
 		# Report
 
 		for area in context.screen.areas:
 			area.tag_redraw()
 
-		self.report({'INFO'}, '{} objects removed'.format(obs_del_count))
+		self.report({'INFO'}, 'Objects removed: {} curve, {} lattice, {} mesh'.format(curve_del_count, lat_del_count, mesh_del_count))
 
 		return {'FINISHED'}
 
