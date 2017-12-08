@@ -5,8 +5,8 @@ bl_info = {
 	'blender': (2, 79, 0),
 	'location': '3D View > Tool Shelf > Tools',
 	'description': 'Deal with badly organized projects.',
-	'wiki_url': '',
-	'tracker_url': '',
+	'wiki_url': 'https://github.com/mrachinskiy/messythings#readme',
+	'tracker_url': 'https://github.com/mrachinskiy/messythings/issues',
 	'category': 'Scene',
 	}
 
