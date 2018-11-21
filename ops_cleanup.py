@@ -71,7 +71,10 @@ class OBJECT_OT_messythings_cleanup_objects(Operator):
 
             ob.hide = False
 
-            if (ob.type in {"CURVE", "LATTICE"}) or (ob.type == "MESH" and not ob.data.vertices):
+            if (
+                ob.type in {"CURVE", "LATTICE"} or
+                (ob.type == "MESH" and not ob.data.vertices and "booltron_combined" not in ob)
+            ):
                 obs_to_del.add(ob)
 
             # Object dependencies
