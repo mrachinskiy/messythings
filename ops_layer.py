@@ -1,6 +1,6 @@
 # ##### BEGIN GPL LICENSE BLOCK #####
 #
-#  JewelCraft jewelry design toolkit for Blender.
+#  Messy Things project organizer for Blender.
 #  Copyright (C) 2017-2018  Mikhail Rachinskiy
 #
 #  This program is free software: you can redistribute it and/or modify
