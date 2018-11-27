@@ -71,11 +71,20 @@ class OBJECT_OT_messythings_cleanup_objects(Operator):
 
             ob.hide = False
 
-            if (
-                ob.type in {"CURVE", "LATTICE"} or
-                (ob.type == "MESH" and not ob.data.vertices and "booltron_combined" not in ob)
-            ):
+            if ob.type in {"CURVE", "LATTICE"}:
                 obs_to_del.add(ob)
+
+            elif ob.type == "MESH" and not ob.data.vertices:
+                ob_del = True
+
+                if ob.modifiers:
+                    for mod in ob.modifiers:
+                        if mod.type == "BOOLEAN" and mod.operation == "UNION" and mod.object:
+                            ob_del = False  # Booltron combined object
+                            break
+
+                if ob_del:
+                    obs_to_del.add(ob)
 
             # Object dependencies
 
