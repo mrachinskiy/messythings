@@ -20,18 +20,12 @@
 
 
 from bpy.types import Operator
+from bpy.props import BoolProperty
 
 
-class OBJECT_OT_messythings_get_misplaced_dependencies(Operator):
-    bl_label = "Messy Things Get Misplaced Dependencies"
-    bl_description = (
-        "Get to active layer objects used in modifiers and constraints by visible objects, "
-        "but located in hidden layers"
-    )
-    bl_idname = "object.messythings_get_misplaced_dependencies"
-    bl_options = {"REGISTER", "UNDO"}
+class Sort:
 
-    def execute(self, context):
+    def get_deps(self, context):
         scene = context.scene
         active_layer = scene.active_layer
         dep_obs = set()
@@ -69,21 +63,9 @@ class OBJECT_OT_messythings_get_misplaced_dependencies(Operator):
                 scene.objects.active = ob
                 break
 
-        self.report({"INFO"}, "{} misplaced objects".format(len(dep_obs)))
+        return len(dep_obs)
 
-        return {"FINISHED"}
-
-
-class OBJECT_OT_messythings_sort_by_layers(Operator):
-    bl_label = "Messy Things Sort Objects By Layers"
-    bl_description = (
-        "Move Curve, Lattice, Empty and Mesh (draw type Wire or Bounds) objets to bottom layers; "
-        "and Curve with bevel profile and Mesh objects to top layers"
-    )
-    bl_idname = "object.messythings_sort_by_layers"
-    bl_options = {"REGISTER", "UNDO"}
-
-    def execute(self, context):
+    def sort_by_layers(self, context):
         top_layers = range(0, 10)
         bottom_layers = range(10, 20)
         obs_sorted_top = 0
@@ -117,8 +99,50 @@ class OBJECT_OT_messythings_sort_by_layers(Operator):
 
                 obs_sorted_bottom += i
 
-        self.report(
-            {"INFO"}, "Objects sorted: {} to top layers, {} to bottom layers".format(obs_sorted_top, obs_sorted_bottom)
-        )
+        return obs_sorted_top, obs_sorted_bottom
+
+
+class SCENE_OT_messythings_sort(Operator, Sort):
+    bl_label = "Messy Things Sort"
+    bl_description = "Sort objects by view layers"
+    bl_idname = "scene.messythings_sort"
+    bl_options = {"REGISTER", "UNDO"}
+
+    use_ob_sort = BoolProperty(name="Sort Objects", description="Move Curve, Lattice, Empty and Mesh (draw type Wire or Bounds) objets to bottom layers; and Curve with bevel profile and Mesh objects to top layers")
+    use_ob_dep_get = BoolProperty(name="Get Dependencies", description="Move to active view layer objects which are used in modifiers and constraints by visible objects, but located in hidden layers")
+
+    def draw(self, context):
+        layout = self.layout
+        col = layout.column(align=True)
+
+        row = col.row(align=True)
+        row.label(icon="OOPS")
+        row.prop(self, "use_ob_sort")
+
+        row = col.row(align=True)
+        row.label(icon="LINKED")
+        row.prop(self, "use_ob_dep_get")
+
+    def execute(self, context):
+        msgs = []
+
+        if self.use_ob_sort:
+            sorted_top, sorted_bottom = self.sort_by_layers(context)
+            msgs.append("{} to top layers".format(sorted_top))
+            msgs.append("{} to bottom layers".format(sorted_bottom))
+
+        if self.use_ob_dep_get:
+            result = self.get_deps(context)
+            msgs.append("{} dependencies to active layer".format(result))
+
+        if not msgs:
+            return {"CANCELLED"}
+
+        msg = "Objects sorted: " + ", ".join(msgs)
+        self.report({"INFO"}, msg)
 
         return {"FINISHED"}
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        return wm.invoke_props_dialog(self, width=300 * context.user_preferences.view.ui_scale)

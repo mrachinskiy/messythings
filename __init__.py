@@ -22,7 +22,7 @@
 bl_info = {
     "name": "Messy Things",
     "author": "Mikhail Rachinskiy",
-    "version": (1, 0, 0),
+    "version": (1, 1, 0),
     "blender": (2, 79, 0),
     "location": "3D View > Tool Shelf > Tools",
     "description": "Deal with badly organized projects.",
@@ -36,26 +36,25 @@ if "bpy" in locals():
     import importlib
 
     importlib.reload(ops_cleanup)
-    importlib.reload(ops_layer)
-    importlib.reload(ops_object)
-    importlib.reload(ops_scene)
+    importlib.reload(ops_sort)
+    importlib.reload(ops_tweak)
     importlib.reload(ui)
 else:
     import bpy
 
-    from . import ops_cleanup, ops_layer, ops_object, ops_scene, ui
+    from . import (
+        ops_cleanup,
+        ops_sort,
+        ops_tweak,
+        ui,
+    )
 
 
 classes = (
     ui.VIEW3D_PT_messythings,
-    ops_cleanup.OBJECT_OT_messythings_cleanup_modifiers,
-    ops_cleanup.OBJECT_OT_messythings_cleanup_objects,
-    ops_cleanup.SCENE_OT_messythings_cleanup_grease_pencil,
-    ops_cleanup.SCENE_OT_messythings_cleanup_materials,
-    ops_layer.OBJECT_OT_messythings_get_misplaced_dependencies,
-    ops_layer.OBJECT_OT_messythings_sort_by_layers,
-    ops_object.OBJECT_OT_messythings_normalize_display,
-    ops_scene.SCENE_OT_messythings_apply_render_profile,
+    ops_cleanup.SCENE_OT_messythings_cleanup,
+    ops_sort.SCENE_OT_messythings_sort,
+    ops_tweak.SCENE_OT_messythings_tweak,
 )
 
 

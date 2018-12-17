@@ -33,20 +33,7 @@ class VIEW3D_PT_messythings(Panel):
     def draw(self, context):
         layout = self.layout
 
-        layout.label("Settings")
-        layout.operator("object.messythings_apply_render_profile", text="Render Profile", icon="SCENE")
-
-        layout.label("Viewport")
-        layout.operator("object.messythings_normalize_display", text="Normalize Display", icon="WIRE")
-
-        layout.label("Scene")
         col = layout.column(align=True)
-        col.operator("object.messythings_get_misplaced_dependencies", text="Get Dependencies", icon="LINKED")
-        col.operator("object.messythings_sort_by_layers", text="Sort Objects", icon="OOPS")
-
-        layout.label("Cleanup")
-        col = layout.column(align=True)
-        col.operator("object.messythings_cleanup_modifiers", text="Modifiers", icon="MODIFIER")
-        col.operator("object.messythings_cleanup_objects", text="Objects", icon="OBJECT_DATA")
-        col.operator("scene.messythings_cleanup_materials", text="Materials", icon="MATERIAL")
-        col.operator("scene.messythings_cleanup_grease_pencil", text="Grease Pencil", icon="GREASEPENCIL")
+        col.operator("scene.messythings_tweak", text="Tweak", icon="SCRIPTWIN")
+        col.operator("scene.messythings_sort", text="Sort", icon="OOPS")
+        col.operator("scene.messythings_cleanup", text="Cleanup", icon="SCENE_DATA")

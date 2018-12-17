@@ -21,44 +21,12 @@
 
 import bpy
 from bpy.types import Operator
+from bpy.props import BoolProperty
 
 
-class OBJECT_OT_messythings_cleanup_modifiers(Operator):
-    bl_label = "Messy Things Cleanup Modifiers"
-    bl_description = "Remove Curve, Lattice, Boolean and Shrinkwrap modifiers with empty Object or Target fields"
-    bl_idname = "object.messythings_cleanup_modifiers"
-    bl_options = {"REGISTER", "UNDO"}
+class Cleanup:
 
-    def execute(self, context):
-        mod_del_count = 0
-
-        for ob in context.scene.objects:
-            ob.hide = False
-
-            if ob.modifiers:
-                for mod in ob.modifiers:
-
-                    if (mod.type in {"CURVE", "LATTICE", "BOOLEAN"} and not mod.object) or (
-                        mod.type == "SHRINKWRAP" and not mod.target
-                    ):
-                        ob.modifiers.remove(mod)
-                        mod_del_count += 1
-
-        self.report({"INFO"}, "{} modifiers removed".format(mod_del_count))
-
-        return {"FINISHED"}
-
-
-class OBJECT_OT_messythings_cleanup_objects(Operator):
-    bl_label = "Messy Things Cleanup Objects"
-    bl_description = (
-        "Remove lattice, curve and empty mesh objects that are not in use by modifiers, "
-        "constraints, curve Bevel Object and Taper Object properties"
-    )
-    bl_idname = "object.messythings_cleanup_objects"
-    bl_options = {"REGISTER", "UNDO"}
-
-    def execute(self, context):
+    def cleanup_objects(self, context):
         obs_to_del = set()
         obs_in_use = set()
         curve_del_count = 0
@@ -124,38 +92,26 @@ class OBJECT_OT_messythings_cleanup_objects(Operator):
         for area in context.screen.areas:
             area.tag_redraw()
 
-        self.report(
-            {"INFO"},
-            "Objects removed: {} curve, {} lattice, {} mesh".format(curve_del_count, lat_del_count, mesh_del_count),
-        )
+        return curve_del_count, lat_del_count, mesh_del_count
 
-        return {"FINISHED"}
+    def cleanup_modifiers(self, context):
+        mod_del_count = 0
 
+        for ob in context.scene.objects:
+            ob.hide = False
 
-class SCENE_OT_messythings_cleanup_grease_pencil(Operator):
-    bl_label = "Messy Things Cleanup Grease Pencil"
-    bl_description = "Remove all grease pencil datablocks"
-    bl_idname = "scene.messythings_cleanup_grease_pencil"
-    bl_options = {"REGISTER", "UNDO"}
+            if ob.modifiers:
+                for mod in ob.modifiers:
 
-    def execute(self, context):
-        count = len(bpy.data.grease_pencil)
+                    if (mod.type in {"CURVE", "LATTICE", "BOOLEAN"} and not mod.object) or (
+                        mod.type == "SHRINKWRAP" and not mod.target
+                    ):
+                        ob.modifiers.remove(mod)
+                        mod_del_count += 1
 
-        for gp in bpy.data.grease_pencil:
-            bpy.data.grease_pencil.remove(gp)
+        return mod_del_count
 
-        self.report({"INFO"}, "{} datablocks removed".format(count))
-
-        return {"FINISHED"}
-
-
-class SCENE_OT_messythings_cleanup_materials(Operator):
-    bl_label = "Messy Things Cleanup Materials"
-    bl_description = "Remove all materials from file, additionally remove material slots from objects"
-    bl_idname = "scene.messythings_cleanup_materials"
-    bl_options = {"REGISTER", "UNDO"}
-
-    def execute(self, context):
+    def cleanup_materials(self, context):
         scene = context.scene
         active_object = context.active_object
         count = len(bpy.data.materials)
@@ -173,6 +129,78 @@ class SCENE_OT_messythings_cleanup_materials(Operator):
 
         scene.objects.active = active_object
 
-        self.report({"INFO"}, "{} materials removed".format(count))
+        return count
+
+    def cleanup_grease_pencil(self, context):
+        count = len(bpy.data.grease_pencil)
+
+        for gp in bpy.data.grease_pencil:
+            bpy.data.grease_pencil.remove(gp)
+
+        return count
+
+
+class SCENE_OT_messythings_cleanup(Operator, Cleanup):
+    bl_label = "Messy Things Cleanup"
+    bl_description = "Remove redundant or purge all datablocks of set type"
+    bl_idname = "scene.messythings_cleanup"
+    bl_options = {"REGISTER", "UNDO"}
+
+    use_objects = BoolProperty(name="Objects", description="Remove lattice, curve and empty mesh objects that are not in use by modifiers, constraints, curve Bevel Object and Taper Object properties")
+    use_modifiers = BoolProperty(name="Modifiers", description="Remove Curve, Lattice, Boolean and Shrinkwrap modifiers with empty Object or Target fields")
+    use_materials = BoolProperty(name="Materials", description="Purge all materials from file, additionally remove material slots from objects")
+    use_gp = BoolProperty(name="Grease Pencil", description="Purge all grease pencil datablocks")
+
+    def draw(self, context):
+        layout = self.layout
+
+        col = layout.column(align=True)
+
+        row = col.row(align=True)
+        row.label(icon="OBJECT_DATA")
+        row.prop(self, "use_objects")
+
+        row = col.row(align=True)
+        row.label(icon="MODIFIER")
+        row.prop(self, "use_modifiers")
+
+        row = col.row(align=True)
+        row.label(icon="MATERIAL")
+        row.prop(self, "use_materials")
+
+        row = col.row(align=True)
+        row.label(icon="GREASEPENCIL")
+        row.prop(self, "use_gp")
+
+    def execute(self, context):
+        msgs = []
+
+        if self.use_objects:
+            curve, lat, mesh = self.cleanup_objects(context)
+            msgs.append("{} curve".format(curve))
+            msgs.append("{} lattice".format(lat))
+            msgs.append("{} mesh".format(mesh))
+
+        if self.use_modifiers:
+            mod = self.cleanup_modifiers(context)
+            msgs.append("{} modifiers".format(mod))
+
+        if self.use_materials:
+            mat = self.cleanup_materials(context)
+            msgs.append("{} materials".format(mat))
+
+        if self.use_gp:
+            gp = self.cleanup_grease_pencil(context)
+            msgs.append("{} gp".format(gp))
+
+        if not msgs:
+            return {"CANCELLED"}
+
+        msg = "Removed: " + ", ".join(msgs)
+        self.report({"INFO"}, msg)
 
         return {"FINISHED"}
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        return wm.invoke_props_dialog(self, width=300 * context.user_preferences.view.ui_scale)
