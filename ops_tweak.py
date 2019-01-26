@@ -1,7 +1,7 @@
 # ##### BEGIN GPL LICENSE BLOCK #####
 #
 #  Messy Things project organizer for Blender.
-#  Copyright (C) 2017-2018  Mikhail Rachinskiy
+#  Copyright (C) 2017-2019  Mikhail Rachinskiy
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -20,17 +20,22 @@
 
 
 from bpy.types import Operator
-from bpy.props import BoolProperty
 
 
-class Tweak:
+class SCENE_OT_messythings_normalize(Operator):
+    bl_label = "Messy Things Normalize Object Display"
+    bl_description = (
+        "Disable Double Sided and match render to viewport subdivision level "
+        "in Subdivision modifier for all objects in the scene"
+    )
+    bl_idname = "scene.messythings_normalize"
+    bl_options = {"REGISTER", "UNDO"}
 
-    def ob_normalize_display(self, context):
+    def execute(self, context):
         for ob in context.scene.objects:
-            ob.hide = False
+            ob.hide_viewport = False
 
             if ob.type == "MESH":
-                ob.show_all_edges = True
                 ob.data.show_double_sided = False
 
             if ob.modifiers:
@@ -38,7 +43,49 @@ class Tweak:
                     if mod.type == "SUBSURF":
                         mod.render_levels = mod.levels
 
-    def apply_render_profile(self, context):
+        self.report({"INFO"}, "Objects display normalized")
+
+        return {"FINISHED"}
+
+
+class SCENE_OT_messythings_profile_render(Operator):
+    bl_label = "Messy Things Apply Render Profile"
+    bl_description = (
+        "Resolution: 1080 x 1080\n"
+        "Output format: PNG RGBA\n"
+        "Device: GPU\n"
+        "Samples: 100 (preview 10 samples)\n"
+        "Tile order: Top to Bottom\n"
+        "View transform: Filmic (Look: None)"
+    )
+    bl_idname = "scene.messythings_profile_render"
+    bl_options = {"REGISTER", "UNDO"}
+
+    # TODO props dialog
+
+    # resolution_x = IntProperty(default=1080, options={"SKIP_SAVE"})
+    # resolution_y = IntProperty(default=1080, options={"SKIP_SAVE"})
+    # resolution_percentage = IntProperty(default=100, options={"SKIP_SAVE"})
+    # file_format = StringProperty(default="PNG", options={"SKIP_SAVE"})
+    # color_mode = StringProperty(default="RGBA", options={"SKIP_SAVE"})
+    # compression = IntProperty(default=100, options={"SKIP_SAVE"})
+    # display_mode = StringProperty(default="SCREEN", options={"SKIP_SAVE"})
+
+    # film_transparent = BoolProperty(default=True, options={"SKIP_SAVE"})
+    # device = StringProperty(default="GPU", options={"SKIP_SAVE"})
+    # pixel_filter_type = StringProperty(default="BLACKMAN_HARRIS", options={"SKIP_SAVE"})
+    # progressive = StringProperty(default="PATH", options={"SKIP_SAVE"})
+    # use_square_samples = BoolProperty(default=False, options={"SKIP_SAVE"})
+    # samples = IntProperty(default=100, options={"SKIP_SAVE"})
+    # preview_samples = IntProperty(default=10, options={"SKIP_SAVE"})
+    # sample_clamp_indirect = FloatProperty(default=10.0, options={"SKIP_SAVE"})
+    # light_sampling_threshold = FloatProperty(default=0.01, options={"SKIP_SAVE"})
+    # tile_order = StringProperty(default="TOP_TO_BOTTOM", options={"SKIP_SAVE"})
+
+    # view_transform = StringProperty(default="Filmic", options={"SKIP_SAVE"})
+    # look = StringProperty(default="None", options={"SKIP_SAVE"})
+
+    def execute(self, context):
         scene = context.scene
 
         render = scene.render
@@ -67,57 +114,11 @@ class Tweak:
         scene.view_settings.view_transform = "Filmic"
         scene.view_settings.look = "None"
 
-
-class SCENE_OT_messythings_tweak(Operator, Tweak):
-    bl_label = "Messy Things Tweak"
-    bl_description = "Tweak scene and object settings"
-    bl_idname = "scene.messythings_tweak"
-    bl_options = {"REGISTER", "UNDO"}
-
-    use_ob_normalize = BoolProperty(name="Normalize Object Display", description="Disable Double Sided, enable Draw All Edges, match render to viewport subdivision level of SubD modifier for all objects in the scene")
-    use_render_profile = BoolProperty(
-        name="Apply Render Profile",
-        description=(
-            "Resolution: 1080 x 1080\n"
-            "Output format: PNG RGBA\n"
-            "Device: GPU\n"
-            "Samples: 100 (preview 10 samples)\n"
-            "Tile order: Top to Bottom\n"
-            "View transform: Filmic (Look: None)"
-        )
-    )
-
-    def draw(self, context):
-        layout = self.layout
-        col = layout.column(align=True)
-
-        row = col.row(align=True)
-        row.label(icon="WIRE")
-        row.prop(self, "use_ob_normalize")
-
-        row = col.row(align=True)
-        row.label(icon="RESTRICT_RENDER_OFF")
-        row.prop(self, "use_render_profile")
-
-    def execute(self, context):
-        msgs = []
-
-        if self.use_ob_normalize:
-            self.ob_normalize_display(context)
-            msgs.append("objects display normalized")
-
-        if self.use_render_profile:
-            self.apply_render_profile(context)
-            msgs.append("render profile applied")
-
-        if not msgs:
-            return {"CANCELLED"}
-
-        msg = "Tweaked: " + ", ".join(msgs)
-        self.report({"INFO"}, msg)
+        self.report({"INFO"}, "Render profile applied")
 
         return {"FINISHED"}
 
-    def invoke(self, context, event):
-        wm = context.window_manager
-        return wm.invoke_props_dialog(self, width=300 * context.user_preferences.view.ui_scale)
+    # TODO props dialog
+    # def invoke(self, context, event):
+    #     wm = context.window_manager
+    #     return wm.invoke_props_dialog(self)

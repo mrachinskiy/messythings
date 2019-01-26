@@ -1,7 +1,7 @@
 # ##### BEGIN GPL LICENSE BLOCK #####
 #
 #  Messy Things project organizer for Blender.
-#  Copyright (C) 2017-2018  Mikhail Rachinskiy
+#  Copyright (C) 2017-2019  Mikhail Rachinskiy
 #
 #  This program is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -23,17 +23,27 @@ from bpy.types import Panel
 
 
 class VIEW3D_PT_messythings(Panel):
-    bl_category = "Tools"
-    bl_space_type = "VIEW_3D"
-    bl_region_type = "TOOLS"
     bl_label = "Messy Things"
-    bl_context = "objectmode"
+    bl_space_type = "PROPERTIES"
+    bl_region_type = "WINDOW"
+    bl_context = "scene"
     bl_options = {"DEFAULT_CLOSED"}
 
     def draw(self, context):
         layout = self.layout
 
-        col = layout.column(align=True)
-        col.operator("scene.messythings_tweak", text="Tweak", icon="SCRIPTWIN")
-        col.operator("scene.messythings_sort", text="Sort", icon="OOPS")
-        col.operator("scene.messythings_cleanup", text="Cleanup", icon="SCENE_DATA")
+        flow = layout.grid_flow()
+
+        col = flow.column()
+        col.label(text="Tweak")
+        col.operator("scene.messythings_normalize", text="Object Display", icon="SHADING_WIRE")
+        col.operator("scene.messythings_profile_render", text="Render Profile", icon="OUTPUT")
+
+        col = flow.column()
+        col.label(text="Sort")
+        col.operator("scene.messythings_sort", text="Collections", icon="OUTLINER")
+        col.operator("scene.messythings_deps_select", text="Dependencies", icon="LINKED")
+
+        col = flow.column()
+        col.label(text="Cleanup")
+        col.operator("scene.messythings_cleanup", text="Scene", icon="SCENE_DATA")
