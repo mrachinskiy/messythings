@@ -80,8 +80,15 @@ class SCENE_OT_messythings_sort(Operator):
 
         for ob in context.scene.objects:
             ob.hide_viewport = False
+            is_dupliface = False
 
-            if "gem" in ob or (ob.parent and "gem" in ob.parent):
+            if ob.is_instancer:
+                for child in ob.children:
+                    if "gem" in child:
+                        is_dupliface = True
+                        break
+
+            if "gem" in ob or is_dupliface:
                 obs_gems.add(ob)
             elif (
                 (ob.type == "MESH" and ob.display_type in {"TEXTURED", "SOLID"}) or
