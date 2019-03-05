@@ -8,7 +8,7 @@ How to install
 
 ### Blender 2.80
 
-1. [Download Messy Things v1.2.0 (pre-release).][v_master]<sup>1</sup>
+1. [Download Messy Things v1.2.0 (pre-release).][v1_2_0]<sup>1</sup>
 2. Open `Edit` → `Preferences` → `Add-ons` category.
 3. Use `Install` to install add-on from downloaded zip archive.
 
@@ -26,7 +26,7 @@ How to install
 
 ### Blender 2.80
 
-1. [Загрузите Messy Things v1.2.0 (пре-релиз).][v_master]<sup>1</sup>
+1. [Загрузите Messy Things v1.2.0 (пре-релиз).][v1_2_0]<sup>1</sup>
 2. Откройте `Edit` → `Preferences` → `Add-ons`.
 3. Воспользуйтесь `Install` чтобы установить аддон из загруженного архива.
 
@@ -39,5 +39,5 @@ How to install
 <sup>1</sup> Примечание для пользователей mac: браузер Safari автоматически распаковывает скачиваемые zip архивы, поэтому, чтобы установить аддон, необходимо запаковать папку с файлами аддона обратно в zip архив. Или используйте другой браузер для скачивания аддона.
 
 
-[v_master]: https://github.com/mrachinskiy/messythings/archive/master.zip
+[v1_2_0]: https://github.com/mrachinskiy/messythings/releases/download/v1.2.0/messythings-1_2_0.zip
 [v1_1_0]: https://github.com/mrachinskiy/messythings/releases/download/v1.1.0/messythings-1_1_0.zip
