@@ -22,14 +22,12 @@
 import bpy
 
 
-class Gpencil:
+def cleanup_gpencil(context):
+    count = 0
 
-    def cleanup_gpencil(self, context):
-        count = 0
+    for ob in context.scene.objects:
+        if ob.grease_pencil:
+            bpy.data.grease_pencil.remove(ob.grease_pencil)
+            count += 1
 
-        for ob in context.scene.objects:
-            if ob.grease_pencil:
-                bpy.data.grease_pencil.remove(ob.grease_pencil)
-                count += 1
-
-        return count
+    return count

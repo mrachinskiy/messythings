@@ -19,19 +19,17 @@
 # ##### END GPL LICENSE BLOCK #####
 
 
-class Modifiers:
+def cleanup_modifiers(context):
+    mod_del_count = 0
 
-    def cleanup_modifiers(self, context):
-        mod_del_count = 0
+    for ob in context.scene.objects:
+        if ob.modifiers:
+            for mod in ob.modifiers:
+                if (
+                    (mod.type in {"CURVE", "LATTICE", "BOOLEAN"} and not mod.object) or
+                    (mod.type == "SHRINKWRAP" and not mod.target)
+                ):
+                    ob.modifiers.remove(mod)
+                    mod_del_count += 1
 
-        for ob in context.scene.objects:
-            if ob.modifiers:
-                for mod in ob.modifiers:
-                    if (
-                        (mod.type in {"CURVE", "LATTICE", "BOOLEAN"} and not mod.object) or
-                        (mod.type == "SHRINKWRAP" and not mod.target)
-                    ):
-                        ob.modifiers.remove(mod)
-                        mod_del_count += 1
-
-        return mod_del_count
+    return mod_del_count

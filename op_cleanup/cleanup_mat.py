@@ -22,23 +22,21 @@
 import bpy
 
 
-class Materials:
+def cleanup_materials(context):
+    count = 0
+    override = {"object": None}
 
-    def cleanup_materials(self, context):
-        count = 0
-        override = {"object": None}
+    for mat in bpy.data.materials:
+        if not mat.is_grease_pencil:
+            bpy.data.materials.remove(mat)
+            count += 1
 
-        for mat in bpy.data.materials:
-            if not mat.is_grease_pencil:
-                bpy.data.materials.remove(mat)
-                count += 1
+    for ob in context.scene.objects:
+        if ob.type != "GPENCIL":
+            if ob.material_slots:
+                override["object"] = ob
 
-        for ob in context.scene.objects:
-            if ob.type != "GPENCIL":
-                if ob.material_slots:
-                    override["object"] = ob
+                for _ in ob.material_slots:
+                    bpy.ops.object.material_slot_remove(override)
 
-                    for _ in ob.material_slots:
-                        bpy.ops.object.material_slot_remove(override)
-
-        return count
+    return count

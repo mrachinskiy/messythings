@@ -22,13 +22,13 @@
 from bpy.types import Operator
 from bpy.props import BoolProperty
 
-from .cleanup_obj import Objects
-from .cleanup_mod import Modifiers
-from .cleanup_mat import Materials
-from .cleanup_gp import Gpencil
+from .cleanup_obj import cleanup_objects
+from .cleanup_mod import cleanup_modifiers
+from .cleanup_mat import cleanup_materials
+from .cleanup_gp import cleanup_gpencil
 
 
-class SCENE_OT_messythings_cleanup(Operator, Objects, Modifiers, Materials, Gpencil):
+class SCENE_OT_messythings_cleanup(Operator):
     bl_label = "Messy Things Cleanup"
     bl_description = "Remove redundant or purge all datablocks of set type"
     bl_idname = "scene.messythings_cleanup"
@@ -81,21 +81,21 @@ class SCENE_OT_messythings_cleanup(Operator, Objects, Modifiers, Materials, Gpen
         msgs = []
 
         if self.use_cleanup_objects:
-            curve, lat, mesh = self.cleanup_objects(context)
+            curve, lat, mesh = cleanup_objects(context)
             msgs.append(f"{curve} curve")
             msgs.append(f"{lat} lattice")
             msgs.append(f"{mesh} mesh")
 
         if self.use_cleanup_modifiers:
-            mod = self.cleanup_modifiers(context)
+            mod = cleanup_modifiers(context)
             msgs.append(f"{mod} modifiers")
 
         if self.use_cleanup_materials:
-            mat = self.cleanup_materials(context)
+            mat = cleanup_materials(context)
             msgs.append(f"{mat} materials")
 
         if self.use_cleanup_gpencil:
-            gp = self.cleanup_gpencil(context)
+            gp = cleanup_gpencil(context)
             msgs.append(f"{gp} grease pencil")
 
         if not msgs:

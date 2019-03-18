@@ -39,5 +39,17 @@ How to install
 <sup>1</sup> Примечание для пользователей mac: браузер Safari автоматически распаковывает скачиваемые zip архивы, поэтому, чтобы установить аддон, необходимо запаковать папку с файлами аддона обратно в zip архив. Или используйте другой браузер для скачивания аддона.
 
 
+Contributing
+==========================
+
+### Did you find a bug?
+
+* Ensure the bug can be reproduced in the latest add-on version.
+* If error occurs on add-on installation or activation, check [how to install][install_guide] guide.
+* [Open new issue][new_issue], be sure to include Blender and add-on versions, and screenshot showing the error message.
+
+
 [v1_2_0]: https://github.com/mrachinskiy/messythings/releases/download/v1.2.0/messythings-1_2_0.zip
 [v1_1_0]: https://github.com/mrachinskiy/messythings/releases/download/v1.1.0/messythings-1_1_0.zip
+[install_guide]: https://github.com/mrachinskiy/messythings#how-to-install
+[new_issue]: https://github.com/mrachinskiy/messythings/issues/new

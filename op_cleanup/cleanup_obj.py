@@ -22,72 +22,70 @@
 import bpy
 
 
-class Objects:
+def cleanup_objects(context):
+    obs_to_del = set()
+    obs_in_use = set()
+    curve_del_count = 0
+    lat_del_count = 0
+    mesh_del_count = 0
 
-    def cleanup_objects(self, context):
-        obs_to_del = set()
-        obs_in_use = set()
-        curve_del_count = 0
-        lat_del_count = 0
-        mesh_del_count = 0
+    # Get objects
 
-        # Get objects
+    for ob in context.scene.objects:
 
-        for ob in context.scene.objects:
+        ob.hide_viewport = False
 
-            ob.hide_viewport = False
+        if ob.type in {"CURVE", "LATTICE"}:
+            obs_to_del.add(ob)
 
-            if ob.type in {"CURVE", "LATTICE"}:
-                obs_to_del.add(ob)
-
-            elif ob.type == "MESH" and not ob.data.vertices:
-                ob_del = True
-
-                if ob.modifiers:
-                    for mod in ob.modifiers:
-                        if mod.type == "BOOLEAN" and mod.operation == "UNION" and mod.object:
-                            ob_del = False  # Booltron combined object
-                            break
-
-                if ob_del:
-                    obs_to_del.add(ob)
-
-            # Object dependencies
+        elif ob.type == "MESH" and not ob.data.vertices:
+            ob_del = True
 
             if ob.modifiers:
                 for mod in ob.modifiers:
-                    if mod.type in {"CURVE", "LATTICE"} and mod.object:
-                        obs_in_use.add(mod.object)
+                    if mod.type == "BOOLEAN" and mod.operation == "UNION" and mod.object:
+                        ob_del = False  # Booltron combined object
+                        break
 
-            if ob.constraints:
-                for con in ob.constraints:
-                    if con.type == "FOLLOW_PATH" and con.target:
-                        obs_in_use.add(con.target)
+            if ob_del:
+                obs_to_del.add(ob)
 
-            if ob.type == "CURVE":
-                if ob.data.bevel_object:
-                    obs_in_use.add(ob.data.bevel_object)
-                if ob.data.taper_object:
-                    obs_in_use.add(ob.data.taper_object)
+        # Object dependencies
 
-        # Remove objects
+        if ob.modifiers:
+            for mod in ob.modifiers:
+                if mod.type in {"CURVE", "LATTICE"} and mod.object:
+                    obs_in_use.add(mod.object)
 
-        if obs_to_del:
-            for ob in obs_to_del:
-                if ob not in obs_in_use:
+        if ob.constraints:
+            for con in ob.constraints:
+                if con.type == "FOLLOW_PATH" and con.target:
+                    obs_in_use.add(con.target)
 
-                    if ob.type == "CURVE":
-                        curve_del_count += 1
-                    elif ob.type == "LATTICE":
-                        lat_del_count += 1
-                    elif ob.type == "MESH":
-                        mesh_del_count += 1
+        if ob.type == "CURVE":
+            if ob.data.bevel_object:
+                obs_in_use.add(ob.data.bevel_object)
+            if ob.data.taper_object:
+                obs_in_use.add(ob.data.taper_object)
 
-                    bpy.data.objects.remove(ob)
+    # Remove objects
 
-        # Report
+    if obs_to_del:
+        for ob in obs_to_del:
+            if ob not in obs_in_use:
 
-        for area in context.screen.areas:
-            area.tag_redraw()
+                if ob.type == "CURVE":
+                    curve_del_count += 1
+                elif ob.type == "LATTICE":
+                    lat_del_count += 1
+                elif ob.type == "MESH":
+                    mesh_del_count += 1
 
-        return curve_del_count, lat_del_count, mesh_del_count
+                bpy.data.objects.remove(ob)
+
+    # Report
+
+    for area in context.screen.areas:
+        area.tag_redraw()
+
+    return curve_del_count, lat_del_count, mesh_del_count

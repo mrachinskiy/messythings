@@ -33,41 +33,46 @@ bl_info = {
 
 
 if "bpy" in locals():
-    import os
     import importlib
 
-    for entry in os.scandir(os.path.dirname(__file__)):
+    for entry in os.scandir(ADDON_DIR):
 
         if entry.is_file() and entry.name.endswith(".py") and not entry.name.startswith("__"):
             module = os.path.splitext(entry.name)[0]
             importlib.reload(eval(module))
 
         elif entry.is_dir() and not entry.name.startswith((".", "__")):
+
             for subentry in os.scandir(entry.path):
                 if subentry.is_file() and subentry.name.endswith(".py"):
-                    module = entry.name + "." + os.path.splitext(subentry.name)[0]
+                    if subentry.name == "__init__.py":
+                        module = os.path.splitext(entry.name)[0]
+                    else:
+                        module = entry.name + "." + os.path.splitext(subentry.name)[0]
                     importlib.reload(eval(module))
 else:
+    import os
+
     import bpy
 
     from . import (
-        ops_tweak,
+        op_cleanup,
         ops_sort,
+        ops_tweak,
         ui,
     )
-    from .op_cleanup import cleanup_op
+
+
+    ADDON_DIR = os.path.dirname(__file__)
 
 
 classes = (
     ui.VIEW3D_PT_messythings,
-    # ui.VIEW3D_PT_messythings_tweak,
-    # ui.VIEW3D_PT_messythings_sort,
-    # ui.VIEW3D_PT_messythings_cleanup,
-    cleanup_op.SCENE_OT_messythings_cleanup,
-    ops_tweak.SCENE_OT_messythings_normalize,
-    ops_tweak.SCENE_OT_messythings_profile_render,
+    op_cleanup.SCENE_OT_messythings_cleanup,
     ops_sort.SCENE_OT_messythings_deps_select,
     ops_sort.SCENE_OT_messythings_sort,
+    ops_tweak.SCENE_OT_messythings_normalize,
+    ops_tweak.SCENE_OT_messythings_profile_render,
 )
 
 
