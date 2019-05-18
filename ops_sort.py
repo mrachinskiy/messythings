@@ -43,6 +43,7 @@ class SCENE_OT_messythings_deps_select(Operator):
                     ):
                         mod_ob = mod.target if mod.type == "SHRINKWRAP" else mod.object
                         mod_ob.hide_viewport = False
+                        mod_ob.hide_set(False)
                         mod_ob.select_set(True)
                         dep_obs.add(mod_ob)
 
@@ -50,6 +51,7 @@ class SCENE_OT_messythings_deps_select(Operator):
                 for con in ob.constraints:
                     if con.type == "FOLLOW_PATH" and con.target:
                         con.target.hide_viewport = False
+                        con.target.hide_set(False)
                         con.target.select_set(True)
                         dep_obs.add(con.target)
 
@@ -80,6 +82,7 @@ class SCENE_OT_messythings_sort(Operator):
 
         for ob in context.scene.objects:
             ob.hide_viewport = False
+            ob.hide_set(False)
             is_dupliface = False
 
             if ob.is_instancer:

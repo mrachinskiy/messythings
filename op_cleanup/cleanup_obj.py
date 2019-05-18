@@ -34,6 +34,7 @@ def cleanup_objects(context):
     for ob in context.scene.objects:
 
         ob.hide_viewport = False
+        ob.hide_set(False)
 
         if ob.type in {"CURVE", "LATTICE"}:
             obs_to_del.add(ob)
