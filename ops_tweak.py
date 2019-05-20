@@ -58,31 +58,31 @@ class SCENE_OT_messythings_profile_render(Operator):
     bl_idname = "scene.messythings_profile_render"
     bl_options = {"REGISTER", "UNDO"}
 
-    resolution_x = IntProperty(
+    resolution_x: IntProperty(
         default=1080,
         min=4,
         subtype="PIXEL",
         options={"SKIP_SAVE"},
     )
-    resolution_y = IntProperty(
+    resolution_y: IntProperty(
         default=1080,
         min=4,
         subtype="PIXEL",
         options={"SKIP_SAVE"},
     )
-    samples = IntProperty(
+    samples: IntProperty(
         name="Render",
         default=100,
         min=1,
         options={"SKIP_SAVE"},
     )
-    preview_samples = IntProperty(
+    preview_samples: IntProperty(
         name="Viewport",
         default=10,
         min=0,
         options={"SKIP_SAVE"},
     )
-    file_format = EnumProperty(
+    file_format: EnumProperty(
         name="File Format",
         items=(
             ("OPEN_EXR", "OpenEXR", ""),
@@ -91,7 +91,7 @@ class SCENE_OT_messythings_profile_render(Operator):
         default="PNG",
         options={"SKIP_SAVE"},
     )
-    display_mode = EnumProperty(
+    display_mode: EnumProperty(
         name="Display Mode",
         items=(
             ("SCREEN", "Full Screen", ""),
