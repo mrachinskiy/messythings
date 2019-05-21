@@ -8,7 +8,7 @@ How to install
 
 ### Blender 2.80
 
-1. [Download Messy Things v1.2.0 (pre-release).][v1_2_1]<sup>1</sup>
+1. [Download Messy Things v1.2.1 (pre-release).][v1_2_1]<sup>1</sup>
 2. Open `Edit` → `Preferences` → `Add-ons` category.
 3. Use `Install` to install add-on from downloaded zip archive.
 
@@ -26,7 +26,7 @@ How to install
 
 ### Blender 2.80
 
-1. [Загрузите Messy Things v1.2.0 (пре-релиз).][v1_2_1]<sup>1</sup>
+1. [Загрузите Messy Things v1.2.1 (пре-релиз).][v1_2_1]<sup>1</sup>
 2. Откройте `Edit` → `Preferences` → `Add-ons`.
 3. Воспользуйтесь `Install` чтобы установить аддон из загруженного архива.
 
