@@ -22,7 +22,7 @@
 bl_info = {
     "name": "Messy Things",
     "author": "Mikhail Rachinskiy",
-    "version": (1, 2, 0),
+    "version": (1, 2, 1),
     "blender": (2, 80, 0),
     "location": "Properties > Scene",
     "description": "Deal with badly organized projects.",
@@ -60,7 +60,6 @@ if "bpy" in locals():
                 walk(entry.path, parent_dir=dirname)
 
     walk(addon_dir)
-
 else:
     import bpy
 
