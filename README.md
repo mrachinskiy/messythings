@@ -7,8 +7,8 @@ How to install
 ==========================
 
 1. Download the add-on:<sup>1</sup>
-    * [**Blender 2.80** Messy Things v1.2.1 (pre-release).][v1_2_1]
-    * [**Blender 2.79** Messy Things v1.1.0.][v1_1_0]
+    * [**Blender 2.80** Messy Things v1.2.1][v1_2_1]
+    * [**Blender 2.79** Messy Things v1.1.0][v1_1_0]
 2. Open `Preferences` → `Add-ons` category.
 3. Use `Install` to install add-on from downloaded zip archive.
 
@@ -19,8 +19,8 @@ How to install
 ==========================
 
 1. Загрузите аддон:<sup>1</sup>
-    * [**Blender 2.80** Messy Things v1.2.1 (пре-релиз).][v1_2_1]
-    * [**Blender 2.79** Messy Things v1.1.0.][v1_1_0]
+    * [**Blender 2.80** Messy Things v1.2.1][v1_2_1]
+    * [**Blender 2.79** Messy Things v1.1.0][v1_1_0]
 2. Откройте `Preferences` → `Add-ons`.
 3. Воспользуйтесь `Install` чтобы установить аддон из загруженного архива.
 
