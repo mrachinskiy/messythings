@@ -24,10 +24,15 @@ import bpy
 
 def cleanup_gpencil(context):
     count = 0
+    excluded = set()
 
     for ob in context.scene.objects:
-        if ob.grease_pencil:
-            bpy.data.grease_pencil.remove(ob.grease_pencil)
+        if ob.type == "GPENCIL":
+            excluded.add(ob.data)
+
+    for gp in bpy.data.grease_pencils:
+        if gp not in excluded:
+            bpy.data.grease_pencils.remove(gp)
             count += 1
 
     return count

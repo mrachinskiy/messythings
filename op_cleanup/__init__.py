@@ -50,8 +50,8 @@ class SCENE_OT_messythings_cleanup(Operator):
         description="Purge all materials from file, additionally remove material slots from objects",
     )
     use_cleanup_gpencil: BoolProperty(
-        name="Annotations",
-        description="Remove redundant (Blender 2.7x) grease pencil object data from non grease pencil objects"
+        name="Annotations (Purge)",
+        description="Purge all annotations from file"
     )
 
     def draw(self, context):
@@ -96,7 +96,7 @@ class SCENE_OT_messythings_cleanup(Operator):
 
         if self.use_cleanup_gpencil:
             gp = cleanup_gpencil(context)
-            msgs.append(f"{gp} grease pencil")
+            msgs.append(f"{gp} annotations")
 
         if not msgs:
             return {"CANCELLED"}

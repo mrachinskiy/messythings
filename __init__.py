@@ -22,7 +22,7 @@
 bl_info = {
     "name": "Messy Things",
     "author": "Mikhail Rachinskiy",
-    "version": (1, 2, 1),
+    "version": (1, 2, 2),
     "blender": (2, 80, 0),
     "location": "Properties > Scene",
     "description": "Deal with badly organized projects.",

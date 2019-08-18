@@ -21,6 +21,7 @@
 
 import bpy
 from bpy.types import Operator
+from bpy.props import BoolProperty
 
 
 class SCENE_OT_messythings_deps_select(Operator):
@@ -73,6 +74,12 @@ class SCENE_OT_messythings_sort(Operator):
     bl_idname = "scene.messythings_sort"
     bl_options = {"REGISTER", "UNDO"}
 
+    use_limit_to_active_coll: BoolProperty(
+        name="Limit to active collection",
+        description="Sort only object under active collection (Shortcut: Alt)",
+        options={"SKIP_SAVE"},
+    )
+
     def execute(self, context):
         obs_main = set()
         obs_gems = set()
@@ -80,7 +87,14 @@ class SCENE_OT_messythings_sort(Operator):
         obs_lights = set()
         obs_gpencil = set()
 
-        for ob in context.scene.objects:
+        if self.use_limit_to_active_coll:
+            parent_coll = context.collection
+            obs = tuple(parent_coll.all_objects)
+        else:
+            parent_coll = context.scene.collection
+            obs = tuple(context.scene.objects)
+
+        for ob in obs:
             ob.hide_viewport = False
             ob.hide_set(False)
             is_dupliface = False
@@ -106,18 +120,12 @@ class SCENE_OT_messythings_sort(Operator):
             else:
                 obs_helpers.add(ob)
 
-        # Unlink objects
+            # Unlink
 
-        for coll in context.scene.collection.children:
-            for ob in coll.objects:
+            for coll in ob.users_collection:
                 coll.objects.unlink(ob)
 
-        if context.scene.collection.objects:
-            coll = context.scene.collection
-            for ob in coll.objects:
-                coll.objects.unlink(ob)
-
-        # Link objects
+        # Link
 
         for name, obs in (
             ("Main", obs_main),
@@ -128,10 +136,18 @@ class SCENE_OT_messythings_sort(Operator):
         ):
             if obs:
                 coll = bpy.data.collections.new(name)
-                context.scene.collection.children.link(coll)
+                parent_coll.children.link(coll)
                 for ob in obs:
                     coll.objects.link(ob)
 
         self.report({"INFO"}, "Objects sorted")
 
         return {"FINISHED"}
+
+    def invoke(self, context, event):
+        if event.ctrl:
+            wm = context.window_manager
+            return wm.invoke_props_dialog(self)
+
+        self.use_limit_to_active_coll = event.alt
+        return self.execute(context)
