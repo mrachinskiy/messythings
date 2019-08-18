@@ -128,8 +128,8 @@ class SCENE_OT_messythings_sort(Operator):
         # Link
 
         for name, obs in (
-            ("Main", obs_main),
             ("Gems", obs_gems),
+            ("Main", obs_main),
             ("Helpers", obs_helpers),
             ("Lights", obs_lights),
             ("Gpensil", obs_gpencil),
