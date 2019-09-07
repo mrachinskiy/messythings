@@ -7,7 +7,7 @@ How to install
 ==========================
 
 1. Download the add-on:<sup>1</sup>
-    * [**Blender 2.80** Messy Things v1.2.2][v1_2_2]
+    * [**Blender 2.80** Messy Things v1.3.0][v1_3_0]
     * [**Blender 2.79** Messy Things v1.1.0][v1_1_0]
 2. Open `Preferences` → `Add-ons` category.
 3. Use `Install` to install add-on from downloaded zip archive.
@@ -19,7 +19,7 @@ How to install
 ==========================
 
 1. Загрузите аддон:<sup>1</sup>
-    * [**Blender 2.80** Messy Things v1.2.2][v1_2_2]
+    * [**Blender 2.80** Messy Things v1.3.0][v1_3_0]
     * [**Blender 2.79** Messy Things v1.1.0][v1_1_0]
 2. Откройте `Preferences` → `Add-ons`.
 3. Воспользуйтесь `Install` чтобы установить аддон из загруженного архива.
@@ -37,6 +37,6 @@ Contributing
 * [Open new issue][new_issue], be sure to include Blender and add-on versions, and screenshot showing the error message.
 
 
-[v1_2_2]: https://github.com/mrachinskiy/messythings/releases/download/v1.2.2/messythings-1_2_2.zip
+[v1_3_0]: https://github.com/mrachinskiy/messythings/releases/download/v1.3.0/messythings-1_3_0.zip
 [v1_1_0]: https://github.com/mrachinskiy/messythings/releases/download/v1.1.0/messythings-1_1_0.zip
 [new_issue]: https://github.com/mrachinskiy/messythings/issues/new

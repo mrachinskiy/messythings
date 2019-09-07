@@ -21,7 +21,7 @@
 
 import bpy
 from bpy.types import Operator
-from bpy.props import BoolProperty
+from bpy.props import EnumProperty
 
 
 class SCENE_OT_messythings_deps_select(Operator):
@@ -65,7 +65,17 @@ class SCENE_OT_messythings_deps_select(Operator):
 
             self.report({"INFO"}, f"{count} dependencies selected")
 
+        else:
+            self.report({"INFO"}, "Dependencies not found")
+
         return {"FINISHED"}
+
+    def invoke(self, context, event):
+        if not context.selected_objects:
+            self.report({"ERROR"}, "Missing selected objects")
+            return {"CANCELLED"}
+
+        return self.execute(context)
 
 
 class SCENE_OT_messythings_sort(Operator):
@@ -74,20 +84,35 @@ class SCENE_OT_messythings_sort(Operator):
     bl_idname = "scene.messythings_sort"
     bl_options = {"REGISTER", "UNDO"}
 
-    use_limit_to_active_coll: BoolProperty(
-        name="Limit to active collection",
-        description="Sort only object under active collection (Shortcut: Alt)",
+    sort_limit: EnumProperty(
+        name="Sort",
+        items=(
+            ("ALL", "All Objects", ""),
+            ("ACTIVE_COLL", "Active Collection", "(Shortcut: Alt)"),
+        ),
         options={"SKIP_SAVE"},
     )
 
+    def draw(self, context):
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False
+
+        layout.separator()
+
+        layout.prop(self, "sort_limit")
+
+        layout.separator()
+
     def execute(self, context):
+        ob_active = context.view_layer.objects.active
         obs_main = set()
         obs_gems = set()
         obs_helpers = set()
         obs_lights = set()
         obs_gpencil = set()
 
-        if self.use_limit_to_active_coll:
+        if self.sort_limit == "ACTIVE_COLL":
             parent_coll = context.collection
             obs = tuple(parent_coll.all_objects)
         else:
@@ -140,14 +165,16 @@ class SCENE_OT_messythings_sort(Operator):
                 for ob in obs:
                     coll.objects.link(ob)
 
-        self.report({"INFO"}, "Objects sorted")
+        context.view_layer.objects.active = ob_active
+
+        self.report({"INFO"}, "Sort completed")
 
         return {"FINISHED"}
 
     def invoke(self, context, event):
-        if event.ctrl:
-            wm = context.window_manager
-            return wm.invoke_props_dialog(self)
+        if event.alt:
+            self.sort_limit = "ACTIVE_COLL"
+            return self.execute(context)
 
-        self.use_limit_to_active_coll = event.alt
-        return self.execute(context)
+        wm = context.window_manager
+        return wm.invoke_props_dialog(self)

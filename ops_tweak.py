@@ -20,29 +20,106 @@
 
 
 from bpy.types import Operator
-from bpy.props import IntProperty, EnumProperty
+from bpy.props import IntProperty, EnumProperty, BoolProperty
 
 
 class SCENE_OT_messythings_normalize(Operator):
-    bl_label = "Messy Things Normalize Object Display"
-    bl_description = (
-        "Match render to viewport subdivision level "
-        "in Subdivision modifier for all objects in the scene"
-    )
+    bl_label = "Messy Things Normalize Objects"
+    bl_description = "Normalize object properties"
     bl_idname = "scene.messythings_normalize"
     bl_options = {"REGISTER", "UNDO"}
 
+    objects_limit: EnumProperty(
+        name="Objects",
+        items=(
+            ("SCENE", "All", ""),
+            ("SELECTED", "Selected", ""),
+        ),
+    )
+    use_mod_screw: BoolProperty(
+        name="Screw",
+        description="Match render to viewport steps",
+        default=True,
+    )
+    use_mod_subd: BoolProperty(
+        name="Subdivision Surface",
+        description="Match render to viewport subdivision levels",
+        default=True,
+    )
+    use_data_rename: BoolProperty(
+        name="Rename After Object",
+        description="Rename object data after object",
+    )
+
+    def draw(self, context):
+        layout = self.layout
+        layout.use_property_split = True
+        layout.use_property_decorate = False
+
+        layout.separator()
+
+        layout.prop(self, "objects_limit")
+
+        col = layout.column(align=True)
+        col.label(text="Modifiers")
+        col.prop(self, "use_mod_screw")
+        col.prop(self, "use_mod_subd")
+
+        col = layout.column(align=True)
+        col.label(text="Object Data")
+        col.prop(self, "use_data_rename")
+
+        layout.separator()
+
     def execute(self, context):
+        use_mods = self.use_mod_screw or self.use_mod_subd
 
-        for ob in context.scene.objects:
-            if ob.modifiers:
+        if not (self.use_data_rename or use_mods):
+            return {"FINISHED"}
+
+        if self.objects_limit == "SCENE":
+            obs = context.scene.objects
+        else:
+            obs = context.selected_objects
+
+            if not obs:
+                self.report({"ERROR"}, "Missing selected objects")
+                return {"CANCELLED"}
+
+        mod_count = 0
+        rename_count = 0
+        msgs = []
+        ob_datas = set()
+
+        for ob in obs:
+
+            if use_mods and ob.modifiers:
                 for mod in ob.modifiers:
-                    if mod.type == "SUBSURF":
+                    if self.use_mod_screw and mod.type == "SCREW" and mod.render_steps != mod.steps:
+                        mod.render_steps = mod.steps
+                        mod_count += 1
+                    if self.use_mod_subd and mod.type == "SUBSURF" and mod.render_levels != mod.levels:
                         mod.render_levels = mod.levels
+                        mod_count += 1
 
-        self.report({"INFO"}, "Objects display normalized")
+            if self.use_data_rename and ob.data and ob.data not in ob_datas and ob.data.name != ob.name:
+                ob.data.name = ob.name
+                ob_datas.add(ob.data)
+                rename_count += 1
+
+        if use_mods:
+            msgs.append(f"{mod_count} Modifiers")
+        if self.use_data_rename:
+            msgs.append(f"{rename_count} Renamed")
+
+        msg = ", ".join(msgs)
+        self.report({"INFO"}, msg)
 
         return {"FINISHED"}
+
+    def invoke(self, context, event):
+        wm = context.window_manager
+        return wm.invoke_props_dialog(self)
 
 
 class SCENE_OT_messythings_profile_render(Operator):

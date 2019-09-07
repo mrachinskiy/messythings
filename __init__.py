@@ -22,7 +22,7 @@
 bl_info = {
     "name": "Messy Things",
     "author": "Mikhail Rachinskiy",
-    "version": (1, 2, 2),
+    "version": (1, 3, 0),
     "blender": (2, 80, 0),
     "location": "Properties > Scene",
     "description": "Deal with badly organized projects.",
@@ -64,7 +64,7 @@ else:
     import bpy
 
     from . import (
-        op_cleanup,
+        ops_cleanup,
         ops_sort,
         ops_tweak,
         ui,
@@ -73,7 +73,8 @@ else:
 
 classes = (
     ui.VIEW3D_PT_messythings,
-    op_cleanup.SCENE_OT_messythings_cleanup,
+    ops_cleanup.OBJECT_OT_messythings_obdata_del,
+    ops_cleanup.SCENE_OT_messythings_scene_cleanup,
     ops_sort.SCENE_OT_messythings_deps_select,
     ops_sort.SCENE_OT_messythings_sort,
     ops_tweak.SCENE_OT_messythings_normalize,

@@ -36,7 +36,7 @@ class VIEW3D_PT_messythings(Panel):
 
         col = flow.column()
         col.label(text="Tweak")
-        col.operator("scene.messythings_normalize", text="Object Display", icon="SHADING_WIRE")
+        col.operator("scene.messythings_normalize", text="Normalize Objects", icon="SHADING_WIRE")
         col.operator("scene.messythings_profile_render", text="Render Profile", icon="OUTPUT")
 
         col = flow.column()
@@ -46,4 +46,5 @@ class VIEW3D_PT_messythings(Panel):
 
         col = flow.column()
         col.label(text="Cleanup")
-        col.operator("scene.messythings_cleanup", text="Scene", icon="SCENE_DATA")
+        col.operator("scene.messythings_scene_cleanup", text="Scene", icon="SCENE_DATA")
+        col.operator("object.messythings_obdata_del", text="Object Data", icon="MESH_DATA")
