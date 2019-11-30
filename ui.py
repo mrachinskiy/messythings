@@ -45,6 +45,6 @@ class VIEW3D_PT_messythings(Panel):
         col.operator("scene.messythings_deps_select", text="Dependencies", icon="LINKED")
 
         col = flow.column()
-        col.label(text="Cleanup")
+        col.label(text="Clean Up")
         col.operator("scene.messythings_scene_cleanup", text="Scene", icon="SCENE_DATA")
         col.operator("object.messythings_obdata_del", text="Object Data", icon="MESH_DATA")

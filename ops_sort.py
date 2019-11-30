@@ -21,7 +21,7 @@
 
 import bpy
 from bpy.types import Operator
-from bpy.props import EnumProperty
+from bpy.props import EnumProperty, BoolProperty
 
 
 class SCENE_OT_messythings_deps_select(Operator):
@@ -90,7 +90,11 @@ class SCENE_OT_messythings_sort(Operator):
             ("ALL", "All Objects", ""),
             ("ACTIVE_COLL", "Active Collection", "(Shortcut: Alt)"),
         ),
-        options={"SKIP_SAVE"},
+    )
+    use_collection_cleanup: BoolProperty(
+        name="Claen Up Collections",
+        description="Remove empty collections",
+        default=True,
     )
 
     def draw(self, context):
@@ -101,6 +105,7 @@ class SCENE_OT_messythings_sort(Operator):
         layout.separator()
 
         layout.prop(self, "sort_limit")
+        layout.prop(self, "use_collection_cleanup")
 
         layout.separator()
 
@@ -149,6 +154,13 @@ class SCENE_OT_messythings_sort(Operator):
 
             for coll in ob.users_collection:
                 coll.objects.unlink(ob)
+
+        # Clean-up
+
+        if self.use_collection_cleanup:
+            for coll in bpy.data.collections:
+                if coll is not parent_coll and not coll.all_objects:
+                    bpy.data.collections.remove(coll)
 
         # Link
 
