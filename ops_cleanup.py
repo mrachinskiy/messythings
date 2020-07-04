@@ -25,7 +25,7 @@ from bpy.props import BoolProperty
 
 
 class OBJECT_OT_messythings_obdata_del(Operator):
-    bl_label = "Messy Things Remove Object Data"
+    bl_label = "Remove Object Data"
     bl_description = "Remove object data for selected objects"
     bl_idname = "object.messythings_obdata_del"
     bl_options = {"REGISTER", "UNDO"}
@@ -35,21 +35,6 @@ class OBJECT_OT_messythings_obdata_del(Operator):
     use_del_uv: BoolProperty(name="UVs")
     use_del_crease: BoolProperty(name="Edge Crease")
     use_del_bevel: BoolProperty(name="Edge & Vert Bevel")
-
-    def draw(self, context):
-        layout = self.layout
-        layout.use_property_split = True
-        layout.use_property_decorate = False
-
-        layout.separator()
-
-        layout.prop(self, "use_del_vertex_groups")
-        layout.prop(self, "use_del_vertex_colors")
-        layout.prop(self, "use_del_uv")
-        layout.prop(self, "use_del_crease")
-        layout.prop(self, "use_del_bevel")
-
-        layout.separator()
 
     def execute(self, context):
         vg_del_count = 0
@@ -113,7 +98,7 @@ class OBJECT_OT_messythings_obdata_del(Operator):
 
 
 class SCENE_OT_messythings_scene_cleanup(Operator):
-    bl_label = "Messy Things Clean Up"
+    bl_label = "Scene Clean Up"
     bl_description = "Remove redundant or purge all datablocks of set type"
     bl_idname = "scene.messythings_scene_cleanup"
     bl_options = {"REGISTER", "UNDO"}
@@ -145,18 +130,13 @@ class SCENE_OT_messythings_scene_cleanup(Operator):
         layout.use_property_split = True
         layout.use_property_decorate = False
 
-        layout.separator()
-
-        col = layout.column(align=True)
+        col = layout.column(heading="Redundant", align=True)
         col.prop(self, "use_cleanup_objects")
         col.prop(self, "use_cleanup_modifiers")
 
-        col = layout.column(align=True)
-        col.label(text="Purge", icon="ERROR")
+        col = layout.column(heading="Purge", align=True)
         col.prop(self, "use_purge_materials")
         col.prop(self, "use_purge_gpencil")
-
-        layout.separator()
 
     def execute(self, context):
         msgs = []

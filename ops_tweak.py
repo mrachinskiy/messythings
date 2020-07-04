@@ -24,7 +24,7 @@ from bpy.props import IntProperty, EnumProperty, BoolProperty
 
 
 class SCENE_OT_messythings_normalize(Operator):
-    bl_label = "Messy Things Normalize Objects"
+    bl_label = "Normalize Objects"
     bl_description = "Normalize object properties"
     bl_idname = "scene.messythings_normalize"
     bl_options = {"REGISTER", "UNDO"}
@@ -56,20 +56,14 @@ class SCENE_OT_messythings_normalize(Operator):
         layout.use_property_split = True
         layout.use_property_decorate = False
 
-        layout.separator()
-
         layout.prop(self, "objects_limit")
 
-        col = layout.column(align=True)
-        col.label(text="Modifiers")
+        col = layout.column(heading="Modifiers", align=True)
         col.prop(self, "use_mod_screw")
         col.prop(self, "use_mod_subd")
 
-        col = layout.column(align=True)
-        col.label(text="Object Data")
+        col = layout.column(heading="Object Data", align=True)
         col.prop(self, "use_data_rename")
-
-        layout.separator()
 
     def execute(self, context):
         use_mods = self.use_mod_screw or self.use_mod_subd
@@ -123,7 +117,7 @@ class SCENE_OT_messythings_normalize(Operator):
 
 
 class SCENE_OT_messythings_profile_render(Operator):
-    bl_label = "Messy Things Apply Render Profile"
+    bl_label = "Apply Render Profile"
     bl_description = (
         "Resolution: 1080 x 1080\n"
         "Output format: PNG RGBA\n"
@@ -185,8 +179,6 @@ class SCENE_OT_messythings_profile_render(Operator):
         layout.use_property_split = True
         layout.use_property_decorate = False
 
-        layout.separator()
-
         layout.prop(self, "display_mode")
 
         col = layout.column(align=True)
@@ -198,8 +190,6 @@ class SCENE_OT_messythings_profile_render(Operator):
         col.prop(self, "preview_samples")
 
         layout.prop(self, "file_format")
-
-        layout.separator()
 
     def execute(self, context):
         scene = context.scene

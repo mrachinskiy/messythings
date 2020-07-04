@@ -26,7 +26,7 @@ bl_info = {
     "blender": (2, 90, 0),
     "location": "Properties > Scene",
     "description": "Deal with badly organized projects.",
-    "wiki_url": "https://github.com/mrachinskiy/messythings#readme",
+    "doc_url": "https://github.com/mrachinskiy/messythings#readme",
     "tracker_url": "https://github.com/mrachinskiy/messythings/issues",
     "category": "Scene",
 }
@@ -34,8 +34,6 @@ bl_info = {
 
 if "bpy" in locals():
     import os
-
-    addon_dir = os.path.dirname(__file__)
 
     def walk(path, parent_dir=None):
         import importlib
@@ -59,7 +57,7 @@ if "bpy" in locals():
                 dirname = f"{parent_dir}.{entry.name}" if parent_dir else entry.name
                 walk(entry.path, parent_dir=dirname)
 
-    walk(addon_dir)
+    walk(os.path.dirname(__file__))
 else:
     import bpy
 

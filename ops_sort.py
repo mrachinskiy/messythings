@@ -25,7 +25,7 @@ from bpy.props import EnumProperty, BoolProperty
 
 
 class SCENE_OT_messythings_deps_select(Operator):
-    bl_label = "Messy Things Select Dependencies"
+    bl_label = "Select Dependencies"
     bl_description = "Select objects which are used in modifiers and constraints by currently selected objects"
     bl_idname = "scene.messythings_deps_select"
     bl_options = {"REGISTER", "UNDO"}
@@ -79,7 +79,7 @@ class SCENE_OT_messythings_deps_select(Operator):
 
 
 class SCENE_OT_messythings_sort(Operator):
-    bl_label = "Messy Things Sort By Collections"
+    bl_label = "Sort By Collections"
     bl_description = "Sort all objects in the scene in Main, Helpers, Gems, Lights and Gpencil collections"
     bl_idname = "scene.messythings_sort"
     bl_options = {"REGISTER", "UNDO"}
@@ -102,12 +102,8 @@ class SCENE_OT_messythings_sort(Operator):
         layout.use_property_split = True
         layout.use_property_decorate = False
 
-        layout.separator()
-
         layout.prop(self, "sort_limit")
         layout.prop(self, "use_collection_cleanup")
-
-        layout.separator()
 
     def execute(self, context):
         ob_active = context.view_layer.objects.active

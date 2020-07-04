@@ -36,7 +36,7 @@ class VIEW3D_PT_messythings(Panel):
 
         col = flow.column()
         col.label(text="Tweak")
-        col.operator("scene.messythings_normalize", text="Normalize Objects", icon="SHADING_WIRE")
+        col.operator("scene.messythings_normalize", icon="SHADING_WIRE")
         col.operator("scene.messythings_profile_render", text="Render Profile", icon="OUTPUT")
 
         col = flow.column()
