@@ -22,8 +22,8 @@
 bl_info = {
     "name": "Messy Things",
     "author": "Mikhail Rachinskiy",
-    "version": (1, 3, 0),
-    "blender": (2, 80, 0),
+    "version": (1, 4, 0),
+    "blender": (2, 90, 0),
     "location": "Properties > Scene",
     "description": "Deal with badly organized projects.",
     "wiki_url": "https://github.com/mrachinskiy/messythings#readme",
@@ -83,6 +83,16 @@ classes = (
 
 
 def register():
+    if bl_info["blender"] > bpy.app.version:
+        addon_name = bl_info["name"].upper()
+        addon_ver = ".".join(str(x) for x in bl_info["version"])
+        blender_ver = ".".join(str(x) for x in bl_info["blender"][:2])
+        requirements_check = RuntimeError(
+            f"\n!!! BLENDER {blender_ver} IS REQUIRED FOR {addon_name} {addon_ver} !!!"
+            "\n!!! READ INSTALLATION GUIDE !!!"
+        )
+        raise requirements_check
+
     for cls in classes:
         bpy.utils.register_class(cls)
 
