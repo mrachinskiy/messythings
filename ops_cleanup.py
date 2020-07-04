@@ -171,7 +171,8 @@ class SCENE_OT_messythings_scene_cleanup(Operator):
         wm = context.window_manager
         return wm.invoke_props_dialog(self)
 
-    def purge_materials(self, context):
+    @staticmethod
+    def purge_materials(context):
         count = 0
         override = {"object": None}
 
@@ -190,7 +191,8 @@ class SCENE_OT_messythings_scene_cleanup(Operator):
 
         return count
 
-    def purge_gpencil(self, context):
+    @staticmethod
+    def purge_gpencil(context):
         count = 0
         excluded = set()
 
@@ -205,7 +207,8 @@ class SCENE_OT_messythings_scene_cleanup(Operator):
 
         return count
 
-    def cleanup_modifiers(self, context):
+    @staticmethod
+    def cleanup_modifiers(context):
         count = 0
 
         for ob in context.scene.objects:
@@ -220,7 +223,8 @@ class SCENE_OT_messythings_scene_cleanup(Operator):
 
         return count
 
-    def cleanup_objects(self, context):
+    @staticmethod
+    def cleanup_objects(context):
         obs_to_del = set()
         obs_in_use = set()
         curve_del_count = 0
