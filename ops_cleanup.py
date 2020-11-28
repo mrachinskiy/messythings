@@ -19,7 +19,6 @@
 # ##### END GPL LICENSE BLOCK #####
 
 
-import bpy
 from bpy.types import Operator
 from bpy.props import BoolProperty
 
@@ -139,24 +138,26 @@ class SCENE_OT_messythings_scene_cleanup(Operator):
         col.prop(self, "use_purge_gpencil")
 
     def execute(self, context):
+        from . import lib
+
         msgs = []
 
         if self.use_cleanup_objects:
-            curve, lat, mesh = self.cleanup_objects(context)
+            curve, lat, mesh = lib.cleanup_objects(context)
             msgs.append(f"{curve} curve")
             msgs.append(f"{lat} lattice")
             msgs.append(f"{mesh} mesh")
 
         if self.use_cleanup_modifiers:
-            mod = self.cleanup_modifiers(context)
+            mod = lib.cleanup_modifiers(context)
             msgs.append(f"{mod} modifiers")
 
         if self.use_purge_materials:
-            mat = self.purge_materials(context)
+            mat = lib.purge_materials(context)
             msgs.append(f"{mat} materials")
 
         if self.use_purge_gpencil:
-            gp = self.purge_gpencil(context)
+            gp = lib.purge_gpencil(context)
             msgs.append(f"{gp} annotations")
 
         if not msgs:
@@ -170,125 +171,3 @@ class SCENE_OT_messythings_scene_cleanup(Operator):
     def invoke(self, context, event):
         wm = context.window_manager
         return wm.invoke_props_dialog(self)
-
-    @staticmethod
-    def purge_materials(context):
-        count = 0
-        override = {"object": None}
-
-        for mat in bpy.data.materials:
-            if not mat.is_grease_pencil:
-                bpy.data.materials.remove(mat)
-                count += 1
-
-        for ob in context.scene.objects:
-            if ob.type != "GPENCIL":
-                if ob.material_slots:
-                    override["object"] = ob
-
-                    for _ in ob.material_slots:
-                        bpy.ops.object.material_slot_remove(override)
-
-        return count
-
-    @staticmethod
-    def purge_gpencil(context):
-        count = 0
-        excluded = set()
-
-        for ob in context.scene.objects:
-            if ob.type == "GPENCIL":
-                excluded.add(ob.data)
-
-        for gp in bpy.data.grease_pencils:
-            if gp not in excluded:
-                bpy.data.grease_pencils.remove(gp)
-                count += 1
-
-        return count
-
-    @staticmethod
-    def cleanup_modifiers(context):
-        count = 0
-
-        for ob in context.scene.objects:
-            if ob.modifiers:
-                for mod in ob.modifiers:
-                    if (
-                        (mod.type in {"CURVE", "LATTICE", "BOOLEAN"} and not mod.object) or
-                        (mod.type == "SHRINKWRAP" and not mod.target)
-                    ):
-                        ob.modifiers.remove(mod)
-                        count += 1
-
-        return count
-
-    @staticmethod
-    def cleanup_objects(context):
-        obs_to_del = set()
-        obs_in_use = set()
-        curve_del_count = 0
-        lat_del_count = 0
-        mesh_del_count = 0
-
-        # Get objects
-
-        for ob in context.scene.objects:
-
-            ob.hide_viewport = False
-            ob.hide_set(False)
-
-            if ob.type in {"CURVE", "LATTICE"}:
-                obs_to_del.add(ob)
-
-            elif ob.type == "MESH" and not ob.data.vertices:
-                ob_del = True
-
-                if ob.modifiers:
-                    for mod in ob.modifiers:
-                        if mod.type == "BOOLEAN" and mod.operation == "UNION" and mod.object:
-                            ob_del = False  # Booltron combined object
-                            break
-
-                if ob_del:
-                    obs_to_del.add(ob)
-
-            # Object dependencies
-
-            if ob.modifiers:
-                for mod in ob.modifiers:
-                    if mod.type in {"CURVE", "LATTICE"} and mod.object:
-                        obs_in_use.add(mod.object)
-
-            if ob.constraints:
-                for con in ob.constraints:
-                    if con.type == "FOLLOW_PATH" and con.target:
-                        obs_in_use.add(con.target)
-
-            if ob.type == "CURVE":
-                if ob.data.bevel_object:
-                    obs_in_use.add(ob.data.bevel_object)
-                if ob.data.taper_object:
-                    obs_in_use.add(ob.data.taper_object)
-
-        # Remove objects
-
-        if obs_to_del:
-            for ob in obs_to_del:
-                if ob not in obs_in_use:
-
-                    if ob.type == "CURVE":
-                        curve_del_count += 1
-                    elif ob.type == "LATTICE":
-                        lat_del_count += 1
-                    elif ob.type == "MESH":
-                        mesh_del_count += 1
-
-                    bpy.data.objects.remove(ob)
-
-        # Report
-
-        for area in context.screen.areas:
-            area.tag_redraw()
-
-        return curve_del_count, lat_del_count, mesh_del_count
