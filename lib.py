@@ -19,8 +19,6 @@
 # ##### END GPL LICENSE BLOCK #####
 
 
-from typing import Tuple
-
 import bpy
 
 
@@ -76,7 +74,7 @@ def cleanup_modifiers(context) -> int:
     return count
 
 
-def cleanup_objects(context) -> Tuple[int, int, int]:
+def cleanup_objects(context) -> tuple[int, int, int]:
     obs_to_del = set()
     obs_in_use = set()
     curve_del_count = 0
