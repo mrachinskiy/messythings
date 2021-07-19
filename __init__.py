@@ -34,10 +34,10 @@ bl_info = {
 
 if "bpy" in locals():
     from pathlib import Path
-    mod_essentials.reload_recursive(Path(__file__).parent, locals())
+    _essential.reload_recursive(Path(__file__).parent, locals())
 else:
-    from . import mod_essentials
-    mod_essentials.check_ver(bl_info)
+    from . import _essential
+    _essential.check(bl_info["blender"])
 
     import bpy
 
