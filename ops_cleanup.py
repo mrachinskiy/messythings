@@ -143,21 +143,21 @@ class SCENE_OT_messythings_scene_cleanup(Operator):
         msgs = []
 
         if self.use_cleanup_objects:
-            curve, lat, mesh = lib.cleanup_objects(context)
+            curve, lat, mesh = lib.cleanup_objects()
             msgs.append(f"{curve} curve")
             msgs.append(f"{lat} lattice")
             msgs.append(f"{mesh} mesh")
 
         if self.use_cleanup_modifiers:
-            mod = lib.cleanup_modifiers(context)
+            mod = lib.cleanup_modifiers()
             msgs.append(f"{mod} modifiers")
 
         if self.use_purge_materials:
-            mat = lib.purge_materials(context)
+            mat = lib.purge_materials()
             msgs.append(f"{mat} materials")
 
         if self.use_purge_gpencil:
-            gp = lib.purge_gpencil(context)
+            gp = lib.purge_gpencil()
             msgs.append(f"{gp} annotations")
 
         if not msgs:

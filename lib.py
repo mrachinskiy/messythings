@@ -22,7 +22,7 @@
 import bpy
 
 
-def purge_materials(context) -> int:
+def purge_materials() -> int:
     count = 0
     override = {"object": None}
 
@@ -31,7 +31,7 @@ def purge_materials(context) -> int:
             bpy.data.materials.remove(mat)
             count += 1
 
-    for ob in context.scene.objects:
+    for ob in bpy.context.scene.objects:
         if ob.type != "GPENCIL":
             if ob.material_slots:
                 override["object"] = ob
@@ -42,11 +42,11 @@ def purge_materials(context) -> int:
     return count
 
 
-def purge_gpencil(context) -> int:
+def purge_gpencil() -> int:
     count = 0
     excluded = set()
 
-    for ob in context.scene.objects:
+    for ob in bpy.context.scene.objects:
         if ob.type == "GPENCIL":
             excluded.add(ob.data)
 
@@ -58,10 +58,10 @@ def purge_gpencil(context) -> int:
     return count
 
 
-def cleanup_modifiers(context) -> int:
+def cleanup_modifiers() -> int:
     count = 0
 
-    for ob in context.scene.objects:
+    for ob in bpy.context.scene.objects:
         if ob.modifiers:
             for mod in ob.modifiers:
                 if (
@@ -74,7 +74,7 @@ def cleanup_modifiers(context) -> int:
     return count
 
 
-def cleanup_objects(context) -> tuple[int, int, int]:
+def cleanup_objects() -> tuple[int, int, int]:
     obs_to_del = set()
     obs_in_use = set()
     curve_del_count = 0
@@ -83,7 +83,7 @@ def cleanup_objects(context) -> tuple[int, int, int]:
 
     # Get objects
 
-    for ob in context.scene.objects:
+    for ob in bpy.context.scene.objects:
 
         ob.hide_viewport = False
         ob.hide_set(False)
@@ -138,7 +138,7 @@ def cleanup_objects(context) -> tuple[int, int, int]:
 
     # Report
 
-    for area in context.screen.areas:
+    for area in bpy.context.screen.areas:
         area.tag_redraw()
 
     return curve_del_count, lat_del_count, mesh_del_count
