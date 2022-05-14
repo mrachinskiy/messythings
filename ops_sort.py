@@ -5,7 +5,7 @@ from typing import Iterator
 
 import bpy
 from bpy.types import Operator, Object, Modifier
-from bpy.props import EnumProperty, BoolProperty
+from bpy.props import EnumProperty, BoolProperty, StringProperty
 
 
 _mod_ob_prop = {
@@ -37,9 +37,17 @@ class SCENE_OT_messythings_deps_select(Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
+        if self.use_collection:
+            obs = tuple(context.collection.all_objects)
+        else:
+            obs = context.selected_objects
+
+        if not obs:
+            return {"CANCELLED"}
+
         dep_obs = set()
 
-        for ob in context.selected_objects:
+        for ob in obs:
             ob.select_set(False)
 
             if ob.modifiers:
@@ -73,7 +81,9 @@ class SCENE_OT_messythings_deps_select(Operator):
         return {"FINISHED"}
 
     def invoke(self, context, event):
-        if not context.selected_objects:
+        self.use_collection = context.area.type == "OUTLINER"
+
+        if not self.use_collection and not context.selected_objects:
             self.report({"ERROR"}, "Missing selected objects")
             return {"CANCELLED"}
 
@@ -86,29 +96,14 @@ class SCENE_OT_messythings_sort(Operator):
     bl_idname = "scene.messythings_sort"
     bl_options = {"REGISTER", "UNDO"}
 
-    sort_limit: EnumProperty(
-        name="Sort",
-        items=(
-            ("ALL", "All Objects", ""),
-            ("ACTIVE_COLL", "Active Collection", "(Shortcut: Alt)"),
-        ),
-    )
     use_collection_cleanup: BoolProperty(
         name="Claen Up Collections",
         description="Remove empty collections",
         default=True,
     )
 
-    def draw(self, context):
-        layout = self.layout
-        layout.use_property_split = True
-        layout.use_property_decorate = False
-
-        layout.prop(self, "sort_limit")
-        layout.prop(self, "use_collection_cleanup")
-
     def execute(self, context):
-        if self.sort_limit == "ACTIVE_COLL":
+        if self.use_collection:
             parent_coll = context.collection
             obs = tuple(parent_coll.all_objects)
         else:
@@ -185,9 +180,6 @@ class SCENE_OT_messythings_sort(Operator):
         return {"FINISHED"}
 
     def invoke(self, context, event):
-        if event.alt:
-            self.sort_limit = "ACTIVE_COLL"
-            return self.execute(context)
-
+        self.use_collection = context.area.type == "OUTLINER"
         wm = context.window_manager
         return wm.invoke_props_dialog(self)

@@ -53,6 +53,14 @@ class OBJECT_OT_messythings_obdata_del(Operator):
         col.prop(self, "use_del_crease")
 
     def execute(self, context):
+        if self.use_collection:
+            obs = tuple(context.collection.all_objects)
+        else:
+            obs = context.selected_objects
+
+        if not obs:
+            return {"CANCELLED"}
+
         vg_del_count = 0
         fm_del_count = 0
         sk_del_count = 0
@@ -65,10 +73,9 @@ class OBJECT_OT_messythings_obdata_del(Operator):
         bevel_del_count = 0
         crease_del_count = 0
 
-        for ob in context.selected_objects:
+        for ob in obs:
             if ob.type != "MESH":
                 continue
-
 
             if self.use_del_vertex_groups and ob.vertex_groups:
                 ob.vertex_groups.clear()
@@ -159,7 +166,9 @@ class OBJECT_OT_messythings_obdata_del(Operator):
         return {"FINISHED"}
 
     def invoke(self, context, event):
-        if not context.selected_objects:
+        self.use_collection = context.area.type == "OUTLINER"
+
+        if not self.use_collection and not context.selected_objects:
             self.report({"ERROR"}, "Missing selected objects")
             return {"CANCELLED"}
 

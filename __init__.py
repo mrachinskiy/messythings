@@ -6,7 +6,7 @@ bl_info = {
     "author": "Mikhail Rachinskiy",
     "version": (1, 4, 0),
     "blender": (2, 93, 0),
-    "location": "Properties > Scene",
+    "location": "File > Messy Things; Outliner > Collection Menu",
     "description": "Deal with badly organized projects.",
     "doc_url": "https://github.com/mrachinskiy/messythings#readme",
     "tracker_url": "https://github.com/mrachinskiy/messythings/issues",
@@ -49,6 +49,7 @@ def register():
     # ---------------------------
 
     bpy.types.TOPBAR_MT_file.append(ui.draw_messythings_menu)
+    bpy.types.OUTLINER_MT_collection.append(ui.draw_messythings_menu)
 
 
 def unregister():
@@ -59,6 +60,7 @@ def unregister():
     # ---------------------------
 
     bpy.types.TOPBAR_MT_file.remove(ui.draw_messythings_menu)
+    bpy.types.OUTLINER_MT_collection.remove(ui.draw_messythings_menu)
 
 
 if __name__ == "__main__":

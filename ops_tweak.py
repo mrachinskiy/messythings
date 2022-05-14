@@ -33,7 +33,8 @@ class SCENE_OT_messythings_normalize(Operator):
         layout.use_property_split = True
         layout.use_property_decorate = False
 
-        layout.prop(self, "object_scope", expand=True)
+        if not self.use_collection:
+            layout.prop(self, "object_scope", expand=True)
 
         col = layout.column(heading="Modifiers")
         col.prop(self, "use_mod_match_render")
@@ -50,10 +51,15 @@ class SCENE_OT_messythings_normalize(Operator):
             if not obs:
                 self.report({"ERROR"}, "No objects in the scene")
                 return {"CANCELLED"}
-        else:
+        elif self.object_scope == "SELECTED":
             obs = context.selected_objects
             if not obs:
                 self.report({"ERROR"}, "Missing selected objects")
+                return {"CANCELLED"}
+        elif self.use_collection:
+            obs = tuple(context.collection.all_objects)
+            if not obs:
+                self.report({"ERROR"}, "Collection is empty")
                 return {"CANCELLED"}
 
         mod_count = 0
@@ -92,5 +98,6 @@ class SCENE_OT_messythings_normalize(Operator):
         return {"FINISHED"}
 
     def invoke(self, context, event):
+        self.use_collection = context.area.type == "OUTLINER"
         wm = context.window_manager
         return wm.invoke_props_dialog(self)
