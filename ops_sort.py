@@ -1,9 +1,33 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 # Copyright 2017-2022 Mikhail Rachinskiy
 
+from typing import Iterator
+
 import bpy
-from bpy.types import Operator
+from bpy.types import Operator, Object, Modifier
 from bpy.props import EnumProperty, BoolProperty
+
+
+_mod_ob_prop = {
+    "CURVE": "object",
+    "BOOLEAN": "object",
+    "LATTICE": "object",
+    "MESH_DEFORM": "object",
+    "SHRINKWRAP": "target",
+    "ARRAY": "offset_object",
+    "MIRROR": "mirror_object",
+    "SIMPLE_DEFORM": "origin",
+}
+
+
+def _ob_from_mod(mod: Modifier) -> Iterator[Object]:
+    if mod.type == "NODES" and mod.node_group:
+        for i in mod.node_group.inputs:
+            if i.type == "OBJECT" and (ob := mod[i.identifier]):
+                yield ob
+
+    if (prop := _mod_ob_prop.get(mod.type)) and (ob := getattr(mod, prop)):
+        yield ob
 
 
 class SCENE_OT_messythings_deps_select(Operator):
@@ -20,15 +44,11 @@ class SCENE_OT_messythings_deps_select(Operator):
 
             if ob.modifiers:
                 for mod in ob.modifiers:
-                    if (
-                        (mod.type in {"CURVE", "LATTICE", "BOOLEAN"} and mod.object) or
-                        (mod.type == "SHRINKWRAP" and mod.target)
-                    ):
-                        mod_ob = mod.target if mod.type == "SHRINKWRAP" else mod.object
-                        mod_ob.hide_viewport = False
-                        mod_ob.hide_set(False)
-                        mod_ob.select_set(True)
-                        dep_obs.add(mod_ob)
+                    for ob_ in _ob_from_mod(mod):
+                        ob_.hide_viewport = False
+                        ob_.hide_set(False)
+                        ob_.select_set(True)
+                        dep_obs.add(ob_)
 
             if ob.constraints:
                 for con in ob.constraints:
@@ -38,17 +58,17 @@ class SCENE_OT_messythings_deps_select(Operator):
                         con.target.select_set(True)
                         dep_obs.add(con.target)
 
-        if dep_obs:
-            count = len(dep_obs)
-
-            for ob in dep_obs:
-                context.view_layer.objects.active = ob
-                break
-
-            self.report({"INFO"}, f"{count} dependencies selected")
-
-        else:
+        if not dep_obs:
             self.report({"INFO"}, "Dependencies not found")
+            return {"CANCELLED"}
+
+        count = len(dep_obs)
+
+        for ob in dep_obs:
+            context.view_layer.objects.active = ob
+            break
+
+        self.report({"INFO"}, f"{count} dependencies selected")
 
         return {"FINISHED"}
 
@@ -61,7 +81,7 @@ class SCENE_OT_messythings_deps_select(Operator):
 
 
 class SCENE_OT_messythings_sort(Operator):
-    bl_label = "Sort By Collections"
+    bl_label = "Sort by Collections"
     bl_description = "Sort all objects in the scene in Main, Helpers, Gems, Lights and Gpencil collections"
     bl_idname = "scene.messythings_sort"
     bl_options = {"REGISTER", "UNDO"}
@@ -88,19 +108,22 @@ class SCENE_OT_messythings_sort(Operator):
         layout.prop(self, "use_collection_cleanup")
 
     def execute(self, context):
-        ob_active = context.view_layer.objects.active
-        obs_main = set()
-        obs_gems = set()
-        obs_helpers = set()
-        obs_lights = set()
-        obs_gpencil = set()
-
         if self.sort_limit == "ACTIVE_COLL":
             parent_coll = context.collection
             obs = tuple(parent_coll.all_objects)
         else:
             parent_coll = context.scene.collection
             obs = tuple(context.scene.objects)
+
+        if not obs:
+            return {"CANCELLED"}
+
+        ob_active = context.view_layer.objects.active
+        obs_main = set()
+        obs_gems = set()
+        obs_helpers = set()
+        obs_lights = set()
+        obs_gpencil = set()
 
         for ob in obs:
             ob.hide_viewport = False

@@ -32,13 +32,12 @@ else:
 
 
 classes = (
-    ui.VIEW3D_PT_messythings,
+    ui.VIEW3D_MT_messythings,
     ops_cleanup.OBJECT_OT_messythings_obdata_del,
     ops_cleanup.SCENE_OT_messythings_scene_cleanup,
     ops_sort.SCENE_OT_messythings_deps_select,
     ops_sort.SCENE_OT_messythings_sort,
     ops_tweak.SCENE_OT_messythings_normalize,
-    ops_tweak.SCENE_OT_messythings_profile_render,
 )
 
 
@@ -46,10 +45,20 @@ def register():
     for cls in classes:
         bpy.utils.register_class(cls)
 
+    # Menu
+    # ---------------------------
+
+    bpy.types.TOPBAR_MT_file.append(ui.draw_messythings_menu)
+
 
 def unregister():
     for cls in classes:
         bpy.utils.unregister_class(cls)
+
+    # Menu
+    # ---------------------------
+
+    bpy.types.TOPBAR_MT_file.remove(ui.draw_messythings_menu)
 
 
 if __name__ == "__main__":

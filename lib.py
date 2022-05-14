@@ -6,7 +6,6 @@ import bpy
 
 def purge_materials() -> int:
     count = 0
-    override = {"object": None}
 
     for mat in bpy.data.materials:
         if not mat.is_grease_pencil:
@@ -16,10 +15,8 @@ def purge_materials() -> int:
     for ob in bpy.context.scene.objects:
         if ob.type != "GPENCIL":
             if ob.material_slots:
-                override["object"] = ob
-
                 for _ in ob.material_slots:
-                    bpy.ops.object.material_slot_remove(override)
+                    bpy.ops.object.material_slot_remove({"object": ob})
 
     return count
 
@@ -40,16 +37,22 @@ def purge_gpencil() -> int:
     return count
 
 
+_mod_ob_prop = {
+    "CURVE": "object",
+    "BOOLEAN": "object",
+    "LATTICE": "object",
+    "MESH_DEFORM": "object",
+    "SHRINKWRAP": "target",
+}
+
+
 def cleanup_modifiers() -> int:
     count = 0
 
     for ob in bpy.context.scene.objects:
         if ob.modifiers:
             for mod in ob.modifiers:
-                if (
-                    (mod.type in {"CURVE", "LATTICE", "BOOLEAN"} and not mod.object) or
-                    (mod.type == "SHRINKWRAP" and not mod.target)
-                ):
+                if (prop := _mod_ob_prop.get(mod.type)) and not (ob := getattr(mod, prop)):
                     ob.modifiers.remove(mod)
                     count += 1
 
@@ -66,7 +69,6 @@ def cleanup_objects() -> tuple[int, int, int]:
     # Get objects
 
     for ob in bpy.context.scene.objects:
-
         ob.hide_viewport = False
         ob.hide_set(False)
 
