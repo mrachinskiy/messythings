@@ -1,34 +1,22 @@
+# SPDX-FileCopyrightText: 2017-2024 Mikhail Rachinskiy
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright 2017-2022 Mikhail Rachinskiy
-
-bl_info = {
-    "name": "Messy Things",
-    "author": "Mikhail Rachinskiy",
-    "version": (1, 4, 0),
-    "blender": (2, 93, 0),
-    "location": "File > Messy Things; Outliner > Collection Menu",
-    "description": "Deal with badly organized projects.",
-    "doc_url": "https://github.com/mrachinskiy/messythings#readme",
-    "tracker_url": "https://github.com/mrachinskiy/messythings/issues",
-    "category": "Scene",
-}
 
 
 if "bpy" in locals():
     from pathlib import Path
     _essential.reload_recursive(Path(__file__).parent, locals())
 else:
+    import tomllib
+    from pathlib import Path
+
     from . import _essential
-    _essential.check(bl_info["blender"])
+
+    with open(Path(__file__).parent / "blender_manifest.toml", "rb") as f:
+        _essential.check(tomllib.load(f)["blender_version_min"])
 
     import bpy
 
-    from . import (
-        ops_cleanup,
-        ops_sort,
-        ops_tweak,
-        ui,
-    )
+    from . import ops_cleanup, ops_sort, ops_tweak, ui
 
 
 classes = (

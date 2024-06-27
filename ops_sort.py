@@ -1,11 +1,11 @@
+# SPDX-FileCopyrightText: 2017-2024 Mikhail Rachinskiy
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright 2017-2022 Mikhail Rachinskiy
 
 from typing import Iterator
 
 import bpy
 from bpy.types import Operator, Object, Modifier
-from bpy.props import EnumProperty, BoolProperty, StringProperty
+from bpy.props import BoolProperty
 
 
 _mod_ob_prop = {

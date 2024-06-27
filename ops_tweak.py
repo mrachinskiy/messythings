@@ -1,5 +1,5 @@
+# SPDX-FileCopyrightText: 2017-2024 Mikhail Rachinskiy
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Copyright 2017-2022 Mikhail Rachinskiy
 
 from bpy.types import Operator
 from bpy.props import EnumProperty, BoolProperty
