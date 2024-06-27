@@ -19,7 +19,7 @@ class SCENE_OT_messythings_normalize(Operator):
         ),
     )
     use_mod_match_render: BoolProperty(
-        name="Render Properties",
+        name="Match Render to Viewport",
         description="Match render to viewport properties",
         default=True,
     )
@@ -46,21 +46,19 @@ class SCENE_OT_messythings_normalize(Operator):
         if not (self.use_data_rename or self.use_mod_match_render):
             return {"FINISHED"}
 
-        if self.object_scope == "SCENE":
+        if self.use_collection:
+            obs = tuple(context.collection.all_objects)
+            err_msg = "Collection is empty"
+        elif self.object_scope == "SCENE":
             obs = context.scene.objects
-            if not obs:
-                self.report({"ERROR"}, "No objects in the scene")
-                return {"CANCELLED"}
+            err_msg = "No objects in the scene"
         elif self.object_scope == "SELECTED":
             obs = context.selected_objects
-            if not obs:
-                self.report({"ERROR"}, "Missing selected objects")
-                return {"CANCELLED"}
-        elif self.use_collection:
-            obs = tuple(context.collection.all_objects)
-            if not obs:
-                self.report({"ERROR"}, "Collection is empty")
-                return {"CANCELLED"}
+            err_msg = "Missing selected objects"
+
+        if not obs:
+            self.report({"ERROR"}, err_msg)
+            return {"CANCELLED"}
 
         mod_count = 0
         rename_count = 0
@@ -84,16 +82,15 @@ class SCENE_OT_messythings_normalize(Operator):
 
         msgs = []
 
-        if mod_count:
+        if self.use_mod_match_render:
             msgs.append(f"{mod_count} Modifiers")
-        if rename_count:
+        if self.use_data_rename:
             msgs.append(f"{rename_count} Renamed")
 
         if not msgs:
             return {"CANCELLED"}
 
-        msg = ", ".join(msgs)
-        self.report({"INFO"}, msg)
+        self.report({"INFO"}, ", ".join(msgs))
 
         return {"FINISHED"}
 
