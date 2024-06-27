@@ -2,16 +2,17 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import bpy
-from bpy.types import Operator
+from bpy.types import Operator, AttributeGroup
 from bpy.props import BoolProperty
 
 
-def _try(obj: object, name: str, value=None) -> bool:
-    if getattr(obj, name, False):
-        if value is not None:
-            setattr(obj, name, value)
-        return True
-    return False
+def _attr_del(attributes: AttributeGroup, attr_names: tuple[str]) -> int:
+    i = 0
+    for name in attr_names:
+        if (attr := attributes.get(name)) is not None:
+            attributes.remove(attr)
+            i = 1
+    return i
 
 
 class OBJECT_OT_messythings_obdata_del(Operator):
@@ -21,11 +22,9 @@ class OBJECT_OT_messythings_obdata_del(Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     use_del_vertex_groups: BoolProperty(name="Vertex Groups")
-    use_del_face_maps: BoolProperty(name="Face Maps")
     use_del_shape_keys: BoolProperty(name="Shape Keys")
     use_del_uv: BoolProperty(name="UVs")
     use_del_vertex_colors: BoolProperty(name="Vertex Colors")
-    use_del_attributes: BoolProperty(name="Attributes")
     use_del_mask: BoolProperty(name="Sculpt Mask")
     use_del_skin: BoolProperty(name="Skin Data")
     use_del_normals: BoolProperty(name="Custom Normals")
@@ -39,18 +38,18 @@ class OBJECT_OT_messythings_obdata_del(Operator):
 
         col = layout.column(align=True)
         col.prop(self, "use_del_vertex_groups")
-        col.prop(self, "use_del_face_maps")
         col.prop(self, "use_del_shape_keys")
+
+        col = layout.column(heading="Attributes", align=True)
         col.prop(self, "use_del_uv")
         col.prop(self, "use_del_vertex_colors")
-        col.prop(self, "use_del_attributes")
+        col.prop(self, "use_del_bevel")
+        col.prop(self, "use_del_crease")
 
         col = layout.column(heading="Geometry", align=True)
         col.prop(self, "use_del_mask")
         col.prop(self, "use_del_skin")
         col.prop(self, "use_del_normals")
-        col.prop(self, "use_del_bevel")
-        col.prop(self, "use_del_crease")
 
     def execute(self, context):
         if self.use_collection:
@@ -62,28 +61,26 @@ class OBJECT_OT_messythings_obdata_del(Operator):
             return {"CANCELLED"}
 
         vg_del_count = 0
-        fm_del_count = 0
         sk_del_count = 0
-        vc_del_count = 0
-        attr_del_count = 0
         uv_del_count = 0
+        vc_del_count = 0
+        bevel_del_count = 0
+        crease_del_count = 0
         mask_del_count = 0
         skin_del_count = 0
         normals_del_count = 0
-        bevel_del_count = 0
-        crease_del_count = 0
 
         for ob in obs:
             if ob.type != "MESH":
                 continue
 
+            # Object
+
             if self.use_del_vertex_groups and ob.vertex_groups:
                 ob.vertex_groups.clear()
                 vg_del_count += 1
 
-            if self.use_del_face_maps and ob.face_maps:
-                ob.face_maps.clear()
-                fm_del_count += 1
+            # Data
 
             ob_data = ob.data
 
@@ -91,46 +88,39 @@ class OBJECT_OT_messythings_obdata_del(Operator):
                 ob.shape_key_clear()
                 sk_del_count += 1
 
+            # Attributes
+
             if self.use_del_uv and ob_data.uv_layers:
                 for uv in ob_data.uv_layers:
                     ob_data.uv_layers.remove(uv)
                 uv_del_count += 1
 
-            if self.use_del_vertex_colors and ob_data.vertex_colors:
-                for vc in ob_data.vertex_colors:
-                    ob_data.vertex_colors.remove(vc)
+            if self.use_del_vertex_colors and ob_data.color_attributes:
+                for vc in ob_data.color_attributes:
+                    ob_data.color_attributes.remove(vc)
                 vc_del_count += 1
 
-            if self.use_del_attributes and ob_data.attributes:
-                for attr in ob_data.attributes:
-                    ob_data.attributes.remove(attr)
-                attr_del_count += 1
+            if self.use_del_bevel:
+                bevel_del_count += _attr_del(ob_data.attributes, ("bevel_weight_edge", "bevel_weight_vert"))
+
+            if self.use_del_crease:
+                crease_del_count += _attr_del(ob_data.attributes, ("crease_edge", "crease_vert"))
 
             # Geometry
 
-            override = {"object": ob}
+            with context.temp_override(object=ob):
 
-            if self.use_del_mask and bpy.ops.mesh.customdata_mask_clear.poll(override):
-                bpy.ops.mesh.customdata_mask_clear(override)
-                mask_del_count += 1
+                if self.use_del_mask and bpy.ops.mesh.customdata_mask_clear.poll():
+                    bpy.ops.mesh.customdata_mask_clear()
+                    mask_del_count += 1
 
-            if self.use_del_skin and ob_data.skin_vertices:
-                bpy.ops.mesh.customdata_skin_clear(override)
-                skin_del_count += 1
+                if self.use_del_skin and ob_data.skin_vertices:
+                    bpy.ops.mesh.customdata_skin_clear()
+                    skin_del_count += 1
 
-            if self.use_del_normals and ob_data.has_custom_normals:
-                bpy.ops.mesh.customdata_custom_splitnormals_clear(override)
-                normals_del_count += 1
-
-            if self.use_del_bevel and (ob_data.use_customdata_edge_bevel or ob_data.use_customdata_vertex_bevel):
-                ob_data.use_customdata_edge_bevel = False
-                ob_data.use_customdata_vertex_bevel = False
-                bevel_del_count += 1
-
-            if self.use_del_crease and (ob_data.use_customdata_edge_crease or _try(ob_data, "use_customdata_vertex_crease")):
-                ob_data.use_customdata_edge_crease = False
-                _try(ob_data, "use_customdata_vertex_crease", False)
-                crease_del_count += 1
+                if self.use_del_normals and ob_data.has_custom_normals:
+                    bpy.ops.mesh.customdata_custom_splitnormals_clear()
+                    normals_del_count += 1
 
         msgs = []
 
@@ -138,26 +128,23 @@ class OBJECT_OT_messythings_obdata_del(Operator):
             msgs.append(f"{vg_del_count} Vertex Groups")
         if sk_del_count:
             msgs.append(f"{sk_del_count} Shape Keys")
-        if fm_del_count:
-            msgs.append(f"{fm_del_count} Face Maps")
         if uv_del_count:
             msgs.append(f"{uv_del_count} UVs")
         if vc_del_count:
             msgs.append(f"{vc_del_count} Vertex Colors")
-        if attr_del_count:
-            msgs.append(f"{attr_del_count} Attributes")
+        if bevel_del_count:
+            msgs.append(f"{bevel_del_count} Bevel")
+        if crease_del_count:
+            msgs.append(f"{crease_del_count} Crease")
         if mask_del_count:
             msgs.append(f"{mask_del_count} Mask")
         if skin_del_count:
             msgs.append(f"{skin_del_count} Skin")
         if normals_del_count:
             msgs.append(f"{normals_del_count} Normals")
-        if bevel_del_count:
-            msgs.append(f"{bevel_del_count} Bevel")
-        if crease_del_count:
-            msgs.append(f"{crease_del_count} Crease")
 
         if not msgs:
+            self.report({"INFO"}, "Found nothing to clean up")
             return {"CANCELLED"}
 
         msg = "Removed: " + ", ".join(msgs)
