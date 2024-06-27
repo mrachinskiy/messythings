@@ -22,8 +22,8 @@ _mod_ob_prop = {
 
 def _ob_from_mod(mod: Modifier) -> Iterator[Object]:
     if mod.type == "NODES" and mod.node_group:
-        for i in mod.node_group.inputs:
-            if i.type == "OBJECT" and (ob := mod[i.identifier]):
+        for socket in mod.node_group.interface.items_tree:
+            if socket.socket_type == "NodeSocketObject" and (ob := mod[socket.identifier]):
                 yield ob
 
     if (prop := _mod_ob_prop.get(mod.type)) and (ob := getattr(mod, prop)):
