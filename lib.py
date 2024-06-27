@@ -13,10 +13,12 @@ def purge_materials() -> int:
             count += 1
 
     for ob in bpy.context.scene.objects:
-        if ob.type != "GPENCIL":
-            if ob.material_slots:
+        if ob.type == "GPENCIL":
+            continue
+        if ob.material_slots:
+            with bpy.context.temp_override(object=ob):
                 for _ in ob.material_slots:
-                    bpy.ops.object.material_slot_remove({"object": ob})
+                    bpy.ops.object.material_slot_remove()
 
     return count
 
@@ -38,8 +40,9 @@ def purge_gpencil() -> int:
 
 
 _mod_ob_prop = {
-    "CURVE": "object",
+    "NODES": "node_group",
     "BOOLEAN": "object",
+    "CURVE": "object",
     "LATTICE": "object",
     "MESH_DEFORM": "object",
     "SHRINKWRAP": "target",
@@ -52,7 +55,7 @@ def cleanup_modifiers() -> int:
     for ob in bpy.context.scene.objects:
         if ob.modifiers:
             for mod in ob.modifiers:
-                if (prop := _mod_ob_prop.get(mod.type)) and not (ob := getattr(mod, prop)):
+                if (prop := _mod_ob_prop.get(mod.type)) and getattr(mod, prop) is None:
                     ob.modifiers.remove(mod)
                     count += 1
 
