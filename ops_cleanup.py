@@ -164,7 +164,7 @@ class OBJECT_OT_messythings_obdata_del(Operator):
 
 
 class SCENE_OT_messythings_scene_cleanup(Operator):
-    bl_label = "Scene Clean Up"
+    bl_label = "Clean Up Scene"
     bl_description = "Remove redundant or purge all datablocks of set type"
     bl_idname = "scene.messythings_scene_cleanup"
     bl_options = {"REGISTER", "UNDO"}

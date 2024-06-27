@@ -18,20 +18,16 @@ class VIEW3D_MT_messythings(Menu):
         layout = self.layout
         layout.operator_context = "INVOKE_DEFAULT"
 
-        col = layout.column()
-        col.label(text="Tweak")
-        col.operator("scene.messythings_normalize", icon="SHADING_WIRE")
+        layout.operator("scene.messythings_normalize")
 
         layout.separator()
 
         col = layout.column()
-        col.label(text="Sort")
-        col.operator("scene.messythings_sort", text="By Collections", icon="OUTLINER")
-        col.operator("scene.messythings_deps_select", icon="LINKED")
+        col.operator("scene.messythings_sort")
+        col.operator("scene.messythings_deps_select")
 
         layout.separator()
 
         col = layout.column()
-        col.label(text="Clean Up")
-        col.operator("scene.messythings_scene_cleanup", text="Scene", icon="SCENE_DATA")
-        col.operator("object.messythings_obdata_del", text="Object Data", icon="MESH_DATA")
+        col.operator("scene.messythings_scene_cleanup")
+        col.operator("object.messythings_obdata_del")

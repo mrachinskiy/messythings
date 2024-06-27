@@ -36,8 +36,9 @@ def register():
     # Menu
     # ---------------------------
 
-    bpy.types.TOPBAR_MT_file.append(ui.draw_messythings_menu)
+    bpy.types.VIEW3D_MT_object_context_menu.append(ui.draw_messythings_menu)
     bpy.types.OUTLINER_MT_collection.append(ui.draw_messythings_menu)
+    bpy.types.OUTLINER_MT_object.append(ui.draw_messythings_menu)
 
 
 def unregister():
@@ -47,8 +48,9 @@ def unregister():
     # Menu
     # ---------------------------
 
-    bpy.types.TOPBAR_MT_file.remove(ui.draw_messythings_menu)
+    bpy.types.VIEW3D_MT_object_context_menu.remove(ui.draw_messythings_menu)
     bpy.types.OUTLINER_MT_collection.remove(ui.draw_messythings_menu)
+    bpy.types.OUTLINER_MT_object.remove(ui.draw_messythings_menu)
 
 
 if __name__ == "__main__":
