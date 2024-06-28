@@ -52,13 +52,7 @@ class OBJECT_OT_messythings_obdata_del(Operator):
         col.prop(self, "use_del_normals")
 
     def execute(self, context):
-        if self.use_collection:
-            obs = tuple(context.collection.all_objects)
-        else:
-            obs = context.selected_objects
-
-        if not obs:
-            return {"CANCELLED"}
+        obs = context.selected_objects
 
         vg_del_count = 0
         sk_del_count = 0
@@ -153,9 +147,7 @@ class OBJECT_OT_messythings_obdata_del(Operator):
         return {"FINISHED"}
 
     def invoke(self, context, event):
-        self.use_collection = context.area.type == "OUTLINER"
-
-        if not self.use_collection and not context.selected_objects:
+        if not context.selected_objects:
             self.report({"ERROR"}, "Missing selected objects")
             return {"CANCELLED"}
 

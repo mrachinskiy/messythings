@@ -1,8 +1,27 @@
 # SPDX-FileCopyrightText: 2017-2024 Mikhail Rachinskiy
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-from bpy.types import Operator
-from bpy.props import EnumProperty, BoolProperty
+import bpy
+from bpy.props import BoolProperty
+from bpy.types import Object, Operator
+
+
+def _get_objects() -> list[Object]:
+    if bpy.context.area.type == "OUTLINER":
+
+        if bpy.context.selected_ids:
+
+            for id in bpy.context.selected_ids:
+                if id.id_type == "COLLECTION":
+                    return bpy.context.collection.all_objects
+
+            return bpy.context.selected_objects
+
+    else:
+        if bpy.context.selected_objects:
+            return bpy.context.selected_objects
+
+    return bpy.context.scene.objects
 
 
 class SCENE_OT_messythings_normalize(Operator):
@@ -11,13 +30,6 @@ class SCENE_OT_messythings_normalize(Operator):
     bl_idname = "scene.messythings_normalize"
     bl_options = {"REGISTER", "UNDO"}
 
-    object_scope: EnumProperty(
-        name="Objects",
-        items=(
-            ("SCENE", "All", ""),
-            ("SELECTED", "Selected", ""),
-        ),
-    )
     use_mod_match_render: BoolProperty(
         name="Match Render to Viewport",
         description="Match render to viewport properties",
@@ -33,9 +45,6 @@ class SCENE_OT_messythings_normalize(Operator):
         layout.use_property_split = True
         layout.use_property_decorate = False
 
-        if not self.use_collection:
-            layout.prop(self, "object_scope", expand=True)
-
         col = layout.column(heading="Modifiers")
         col.prop(self, "use_mod_match_render")
 
@@ -46,18 +55,10 @@ class SCENE_OT_messythings_normalize(Operator):
         if not (self.use_data_rename or self.use_mod_match_render):
             return {"FINISHED"}
 
-        if self.use_collection:
-            obs = tuple(context.collection.all_objects)
-            err_msg = "Collection is empty"
-        elif self.object_scope == "SCENE":
-            obs = context.scene.objects
-            err_msg = "No objects in the scene"
-        elif self.object_scope == "SELECTED":
-            obs = context.selected_objects
-            err_msg = "Missing selected objects"
+        obs = _get_objects()
 
         if not obs:
-            self.report({"ERROR"}, err_msg)
+            self.report({"ERROR"}, "Objects not found")
             return {"CANCELLED"}
 
         mod_count = 0
@@ -87,14 +88,10 @@ class SCENE_OT_messythings_normalize(Operator):
         if self.use_data_rename:
             msgs.append(f"{rename_count} Renamed")
 
-        if not msgs:
-            return {"CANCELLED"}
-
         self.report({"INFO"}, ", ".join(msgs))
 
         return {"FINISHED"}
 
     def invoke(self, context, event):
-        self.use_collection = context.area.type == "OUTLINER"
         wm = context.window_manager
         return wm.invoke_props_dialog(self)

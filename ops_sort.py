@@ -4,8 +4,8 @@
 from typing import Iterator
 
 import bpy
-from bpy.types import Operator, Object, Modifier
 from bpy.props import BoolProperty
+from bpy.types import Collection, Modifier, Object, Operator
 
 
 _mod_ob_prop = {
@@ -18,6 +18,15 @@ _mod_ob_prop = {
     "MIRROR": "mirror_object",
     "SIMPLE_DEFORM": "origin",
 }
+
+
+def _get_collection_objects() -> tuple[Collection, tuple[Object]]:
+    if bpy.context.area.type == "OUTLINER" and bpy.context.selected_ids:
+        for id in bpy.context.selected_ids:
+            if id.id_type == "COLLECTION":
+                return bpy.context.collection, tuple(bpy.context.collection.all_objects)
+
+    return bpy.context.scene.collection, tuple(bpy.context.scene.objects)
 
 
 def _ob_from_mod(mod: Modifier) -> Iterator[Object]:
@@ -37,14 +46,7 @@ class SCENE_OT_messythings_deps_select(Operator):
     bl_options = {"REGISTER", "UNDO"}
 
     def execute(self, context):
-        if self.use_collection:
-            obs = tuple(context.collection.all_objects)
-        else:
-            obs = context.selected_objects
-
-        if not obs:
-            return {"CANCELLED"}
-
+        obs = context.selected_objects
         dep_obs = set()
 
         for ob in obs:
@@ -81,9 +83,7 @@ class SCENE_OT_messythings_deps_select(Operator):
         return {"FINISHED"}
 
     def invoke(self, context, event):
-        self.use_collection = context.area.type == "OUTLINER"
-
-        if not self.use_collection and not context.selected_objects:
+        if not context.selected_objects:
             self.report({"ERROR"}, "Missing selected objects")
             return {"CANCELLED"}
 
@@ -103,14 +103,10 @@ class SCENE_OT_messythings_sort(Operator):
     )
 
     def execute(self, context):
-        if self.use_collection:
-            parent_coll = context.collection
-            obs = tuple(parent_coll.all_objects)
-        else:
-            parent_coll = context.scene.collection
-            obs = tuple(context.scene.objects)
+        parent_coll, obs = _get_collection_objects()
 
         if not obs:
+            self.report({"ERROR"}, "Objects not found")
             return {"CANCELLED"}
 
         ob_active = context.view_layer.objects.active
@@ -146,12 +142,12 @@ class SCENE_OT_messythings_sort(Operator):
             else:
                 obs_helpers.add(ob)
 
-            # Unlink
+            # Unlink object from existing collections
 
             for coll in ob.users_collection:
                 coll.objects.unlink(ob)
 
-        # Clean-up
+        # Clean-up empty collections
 
         if self.use_collection_cleanup:
             for coll in bpy.data.collections:
@@ -180,6 +176,5 @@ class SCENE_OT_messythings_sort(Operator):
         return {"FINISHED"}
 
     def invoke(self, context, event):
-        self.use_collection = context.area.type == "OUTLINER"
         wm = context.window_manager
         return wm.invoke_props_dialog(self)
