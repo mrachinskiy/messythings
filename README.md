@@ -8,7 +8,7 @@ How to install
 
 ### For Blender 4.2 or newer
 
-### [Drag and Drop this link into Blender][v1_4_0]
+### [Drag and Drop this link into Blender][download_latest]
 
 <sub>Or download and drag zip file into Blender<sup>1</sup></sub>
 
@@ -30,7 +30,7 @@ How to install
 
 ### Для Blender 4.2 или новее
 
-### [Перетащите эту ссылку в Blender][v1_4_0]
+### [Перетащите эту ссылку в Blender][download_latest]
 
 <sub>Или скачайте и перетащите zip-файл в Blender<sup>1</sup></sub>
 
@@ -57,7 +57,7 @@ Contributing
 * [Open new issue][new_issue], be sure to include Blender and add-on versions, and screenshot showing the error message.
 
 
-[v1_4_0]: https://github.com/mrachinskiy/messythings/releases/download/v1.4.0/messythings-1_4_0.zip
+[download_latest]: https://github.com/mrachinskiy/messythings/releases/download/v1.4.0/messythings-1_4_0.zip?repository=https://mrachinskiy.github.io/api/v1/extensions.json&blender_version_min=4.2.0
 [v1_3_0]: https://github.com/mrachinskiy/messythings/releases/download/v1.3.0/messythings-1_3_0.zip
 [v1_1_0]: https://github.com/mrachinskiy/messythings/releases/download/v1.1.0/messythings-1_1_0.zip
 [new_issue]: https://github.com/mrachinskiy/messythings/issues/new
