@@ -2,11 +2,17 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 import bpy
-from bpy.types import Operator, AttributeGroup
+from bpy.types import Operator
+
+if bpy.app.version >= (4, 3, 0):  # VER
+    from bpy.types import AttributeGroupMesh
+else:
+    from bpy.types import AttributeGroup as AttributeGroupMesh
+
 from bpy.props import BoolProperty
 
 
-def _attr_del(attributes: AttributeGroup, attr_names: tuple[str]) -> int:
+def _attr_del(attributes: AttributeGroupMesh, attr_names: tuple[str]) -> int:
     i = 0
     for name in attr_names:
         if (attr := attributes.get(name)) is not None:
