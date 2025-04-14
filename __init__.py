@@ -1,32 +1,20 @@
-# SPDX-FileCopyrightText: 2017-2024 Mikhail Rachinskiy
+# SPDX-FileCopyrightText: 2017-2025 Mikhail Rachinskiy
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 
 if "bpy" in locals():
     from pathlib import Path
-    _essential.reload_recursive(Path(__file__).parent, locals())
+
+    from . import essentials
+
+    essentials.reload_recursive(Path(__file__).parent, locals())
 else:
-    import tomllib
-    from pathlib import Path
-
-    from . import _essential
-
-    with open(Path(__file__).parent / "blender_manifest.toml", "rb") as f:
-        _essential.check(tomllib.load(f)["blender_version_min"])
-
     import bpy
 
-    from . import ops_cleanup, ops_sort, ops_tweak, ui
+    from . import operators, ui
 
 
-classes = (
-    ui.VIEW3D_MT_messythings,
-    ops_cleanup.OBJECT_OT_messythings_obdata_del,
-    ops_cleanup.SCENE_OT_messythings_scene_cleanup,
-    ops_sort.SCENE_OT_messythings_deps_select,
-    ops_sort.SCENE_OT_messythings_sort,
-    ops_tweak.SCENE_OT_messythings_normalize,
-)
+classes = essentials.get_classes((operators, ui))
 
 
 def register():

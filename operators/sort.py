@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2017-2024 Mikhail Rachinskiy
+# SPDX-FileCopyrightText: 2017-2025 Mikhail Rachinskiy
 # SPDX-License-Identifier: GPL-3.0-or-later
 
 from typing import Iterator

@@ -9,4 +9,4 @@ tags = ["Scene", "Object"]
 blender_version_min = "4.2.0"
 website = "https://github.com/mrachinskiy/messythings"
 license = ["SPDX:GPL-3.0-or-later"]
-copyright = ["2017-2024 Mikhail Rachinskiy"]
+copyright = ["2017-2025 Mikhail Rachinskiy"]
