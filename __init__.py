@@ -4,14 +4,11 @@
 
 if "bpy" in locals():
     from pathlib import Path
-
-    from . import essentials
-
     essentials.reload_recursive(Path(__file__).parent, locals())
 else:
     import bpy
 
-    from . import operators, ui
+    from . import essentials, operators, ui
 
 
 classes = essentials.get_classes((operators, ui))
