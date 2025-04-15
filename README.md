@@ -57,7 +57,7 @@ Contributing
 * [Open new issue][new_issue], be sure to include Blender and add-on versions, and screenshot showing the error message.
 
 
-[download_latest]: https://github.com/mrachinskiy/messythings/releases/download/v1.4.0/messythings-1_4_0.zip?repository=https://mrachinskiy.github.io/api/v1/extensions.json&blender_version_min=4.2.0
+[download_latest]: https://github.com/mrachinskiy/messythings/releases/latest/download/messythings-1_4_1.zip?repository=https://mrachinskiy.github.io/api/v1/extensions.json&blender_version_min=4.2.0
 [v1_3_0]: https://github.com/mrachinskiy/messythings/releases/download/v1.3.0/messythings-1_3_0.zip
 [v1_1_0]: https://github.com/mrachinskiy/messythings/releases/download/v1.1.0/messythings-1_1_0.zip
 [new_issue]: https://github.com/mrachinskiy/messythings/issues/new
