@@ -17,8 +17,8 @@ How to install
 ### For Blender 3.6 or older
 
 1. Download the add-on:<sup>1</sup>
-    * [**Blender 2.80** Messy Things 1.3][v1_3_0]
-    * [**Blender 2.79** Messy Things 1.1][v1_1_0]
+    * [**Blender 2.80** Messy Things 1.3][download_v1_3_0]
+    * [**Blender 2.79** Messy Things 1.1][download_v1_1_0]
 2. Open `Preferences` → `Add-ons` category.
 3. Use `Install` to install add-on from downloaded zip archive.
 
@@ -39,8 +39,8 @@ How to install
 ### Для Blender 3.6 или старше
 
 1. Скачайте дополнение:<sup>1</sup>
-    * [**Blender 2.80** Messy Things v1.3.0][v1_3_0]
-    * [**Blender 2.79** Messy Things v1.1.0][v1_1_0]
+    * [**Blender 2.80** Messy Things v1.3.0][download_v1_3_0]
+    * [**Blender 2.79** Messy Things v1.1.0][download_v1_1_0]
 2. Откройте `Preferences` → `Add-ons`
 3. Воспользуйтесь `Install` чтобы установить дополнение из скачанного архива.
 
@@ -54,10 +54,10 @@ Contributing
 
 * Ensure the bug can be reproduced in the latest add-on version.
 * If error occurs on add-on installation or activation, check [how to install](#how-to-install) guide.
-* [Open new issue][new_issue], be sure to include Blender and add-on versions, and screenshot showing the error message.
+* [Open new issue][issues_url], be sure to include Blender and add-on versions, and screenshot showing the error message.
 
 
 [download_latest]: https://github.com/mrachinskiy/messythings/releases/latest/download/messythings-1_4_1.zip?repository=https://mrachinskiy.github.io/api/v1/extensions.json&blender_version_min=4.2.0
-[v1_3_0]: https://github.com/mrachinskiy/messythings/releases/download/v1.3.0/messythings-1_3_0.zip
-[v1_1_0]: https://github.com/mrachinskiy/messythings/releases/download/v1.1.0/messythings-1_1_0.zip
-[new_issue]: https://github.com/mrachinskiy/messythings/issues/new
+[download_v1_3_0]: https://github.com/mrachinskiy/messythings/releases/download/v1.3.0/messythings-1_3_0.zip
+[download_v1_1_0]: https://github.com/mrachinskiy/messythings/releases/download/v1.1.0/messythings-1_1_0.zip
+[issues_url]: https://github.com/mrachinskiy/messythings/issues
